@@ -1,0 +1,13 @@
+# Agent OS Standards Index
+
+components:
+  structure:
+    description: Component folder organization, exports, and props typing
+
+styling:
+  nativewind:
+    description: NativeWind conventions — component-based styling, semantic tokens, positioning
+
+typescript:
+  conventions:
+    description: Interface vs type, optionals, unions over enums, Prettier
