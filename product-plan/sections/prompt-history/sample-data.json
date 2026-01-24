@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "models": {
+      "prompts": "Past journal prompts you've received from the slot machine, each with three words and the date it was generated."
+    },
+    "relationships": [
+      "Each Prompt contains three words (one from each reel)",
+      "Prompts are sorted by date, newest first"
+    ]
+  },
+  "prompts": [
+    {
+      "id": "prompt-2024-01-23",
+      "words": ["favourite", "childhood", "sandwich"],
+      "createdAt": "2024-01-23T08:42:00Z"
+    },
+    {
+      "id": "prompt-2024-01-22",
+      "words": ["strangest", "midnight", "conversation"],
+      "createdAt": "2024-01-22T07:15:00Z"
+    },
+    {
+      "id": "prompt-2024-01-21",
+      "words": ["happiest", "summer", "discovery"],
+      "createdAt": "2024-01-21T09:30:00Z"
+    },
+    {
+      "id": "prompt-2024-01-20",
+      "words": ["most embarrassing", "school", "mistake"],
+      "createdAt": "2024-01-20T08:05:00Z"
+    },
+    {
+      "id": "prompt-2024-01-19",
+      "words": ["quietest", "morning", "meal"],
+      "createdAt": "2024-01-19T06:45:00Z"
+    },
+    {
+      "id": "prompt-2024-01-18",
+      "words": ["funniest", "family", "gift"],
+      "createdAt": "2024-01-18T10:20:00Z"
+    },
+    {
+      "id": "prompt-2024-01-17",
+      "words": ["forgotten", "birthday", "photograph"],
+      "createdAt": "2024-01-17T08:00:00Z"
+    },
+    {
+      "id": "prompt-2024-01-16",
+      "words": ["proudest", "workplace", "decision"],
+      "createdAt": "2024-01-16T07:30:00Z"
+    },
+    {
+      "id": "prompt-2024-01-15",
+      "words": ["scariest", "travel", "adventure"],
+      "createdAt": "2024-01-15T09:10:00Z"
+    },
+    {
+      "id": "prompt-2024-01-14",
+      "words": ["unexpected", "rainy day", "friendship"],
+      "createdAt": "2024-01-14T08:55:00Z"
+    }
+  ]
+}
