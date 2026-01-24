@@ -2,6 +2,44 @@
 
 ---
 
+## Platform Context
+
+This is an **Expo React Native** mobile app with:
+- **expo-router** — File-based routing (`app/` directory)
+- **NativeWind v5** — Tailwind classes work on RN components
+- **React Native new architecture** enabled
+
+### Component Adaptation
+
+Provided components are **web reference implementations**. Adapt for React Native:
+
+| Web | React Native |
+|-----|--------------|
+| `<div>` | `<View>` |
+| `<button>` | `<Pressable>` or `<TouchableOpacity>` |
+| `<p>`, `<span>`, `<h1>` | `<Text>` |
+| `<header>`, `<main>`, `<article>` | `<View>` |
+| `onClick` | `onPress` |
+
+### Styling Notes
+
+- Tailwind classes work via NativeWind v5
+- `hover:` states → use press states or remove
+- CSS blur → `expo-blur`
+- Complex shadows → RN shadow props
+- Gradients → `expo-linear-gradient`
+
+### Icons & Fonts
+
+- `lucide-react` → `@expo/vector-icons` or `react-native-vector-icons`
+- Google Fonts → load via `expo-font`
+
+### Animations
+
+- CSS animations → React Native Animated API or `react-native-reanimated`
+
+---
+
 ## About These Instructions
 
 **What you're receiving:**

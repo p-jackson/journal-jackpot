@@ -5,6 +5,39 @@
 
 ---
 
+## Platform Context
+
+This is an **Expo React Native** mobile app. Key differences from web:
+
+### Component Adaptation
+
+Provided components are web reference implementations. Adapt:
+
+| Web | React Native |
+|-----|--------------|
+| `<div>` | `<View>` |
+| `<button>` | `<Pressable>` |
+| `<p>`, `<span>`, `<h1>` | `<Text>` |
+| `onClick` | `onPress` |
+
+### Styling
+
+- Tailwind classes work via **NativeWind v5** (already configured in project)
+- `hover:` states → use press states or remove
+- CSS blur → `expo-blur`
+- Gradients → `expo-linear-gradient`
+
+### Icons & Fonts
+
+- `lucide-react` → `@expo/vector-icons`
+- Google Fonts → load via `expo-font` (not HTML `<head>`)
+
+### Animations
+
+- CSS animations → React Native Animated API or `react-native-reanimated`
+
+---
+
 ## About These Instructions
 
 **What you're receiving:**
@@ -70,10 +103,11 @@ Create TypeScript interfaces for your core entities:
 
 ### 3. Routing Structure
 
-Create routes for each section:
+Routes live in the `app/` directory (expo-router file-based routing):
 
-- `/` — Slot Machine (home/default)
-- `/history` — Prompt History
+- `app/index.tsx` → `/` — Slot Machine (home/default)
+- `app/history.tsx` → `/history` — Prompt History
+- `app/_layout.tsx` → Layout wrapper
 
 ### 4. Application Shell
 

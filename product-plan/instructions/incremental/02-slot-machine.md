@@ -5,6 +5,16 @@
 
 ---
 
+## Mobile Adaptation Notes
+
+**Animations:** The spinning reel animations require React Native Animated API or `react-native-reanimated` — CSS keyframes don't work in RN.
+
+**Blur effects:** Use `expo-blur` or `@react-native-community/blur` instead of CSS backdrop-filter.
+
+**Component mapping:** `<div>` → `<View>`, `<button>` → `<Pressable>`, text in `<Text>`, `onClick` → `onPress`.
+
+---
+
 ## About These Instructions
 
 **What you're receiving:**

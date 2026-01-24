@@ -1,6 +1,8 @@
 # One-Shot Implementation Prompt
 
-I need you to implement a complete web application based on detailed design specifications and UI components I'm providing.
+I need you to implement a mobile application using Expo and React Native based on detailed design specifications and UI components I'm providing.
+
+> **Note:** The provided components are web-based reference implementations. Tailwind classes work via NativeWind v5, but you'll need to adapt HTML elements to React Native components (see instruction files for mapping).
 
 ## Instructions
 

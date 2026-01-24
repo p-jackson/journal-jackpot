@@ -5,6 +5,12 @@
 
 ---
 
+## Mobile Adaptation Notes
+
+**Component mapping:** Semantic HTML (`<article>`, `<header>`, `<ul>`, `<li>`) → `<View>`. All text content → `<Text>`. `onClick` → `onPress`.
+
+---
+
 ## About These Instructions
 
 **What you're receiving:**

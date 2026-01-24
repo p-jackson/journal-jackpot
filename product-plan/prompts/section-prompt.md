@@ -10,6 +10,8 @@
 
 I need you to implement the **SECTION_NAME** section of my application.
 
+> **Note:** Provided components are web reference implementations. Adapt HTML → RN components (see instruction files).
+
 ## Instructions
 
 Please carefully read and analyze the following files:

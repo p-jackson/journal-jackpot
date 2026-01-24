@@ -68,14 +68,21 @@ product-plan/
 | Slot Machine   | Skeuomorphic spinning reels, once-per-day limit  |
 | Prompt History | Chronological list of past prompts               |
 
+## Platform
+
+This is a **mobile app** built with:
+- **Expo** — React Native framework
+- **expo-router** — File-based routing in `app/` directory
+- **NativeWind v5** — Tailwind CSS for React Native
+- **React Native new architecture** enabled
+
 ## Tech Assumptions
 
 The prompts will ask your coding agent to clarify:
-- Framework (Next.js, Vite, etc.)
-- Storage (localStorage, database, etc.)
+- Storage (AsyncStorage, database, etc.)
 - Authentication needs (if any)
 
-Components are React + Tailwind CSS v4 and portable to any React setup.
+Components provided are **web-based reference implementations** (React + Tailwind CSS v4). They need adaptation for React Native + NativeWind — see instruction files for component mapping guidance.
 
 ## Design Tokens
 

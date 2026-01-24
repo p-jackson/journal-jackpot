@@ -37,7 +37,29 @@ Journal Jackpot uses Tailwind CSS built-in color palettes:
 
 ### Font Setup
 
-Add to your HTML `<head>`:
+For **Expo/React Native**, load fonts via `expo-font`:
+
+```typescript
+import { useFonts } from 'expo-font';
+import {
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_600SemiBold,
+  SpaceGrotesk_700Bold,
+} from '@expo-google-fonts/space-grotesk';
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans';
+import {
+  IBMPlexMono_400Regular,
+  IBMPlexMono_500Medium,
+} from '@expo-google-fonts/ibm-plex-mono';
+```
+
+For **web** (HTML `<head>`):
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
