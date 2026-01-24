@@ -1,12 +1,26 @@
 # Agent OS Standards Index
 
 components:
+  compound-components:
+    description: Object.assign pattern for related sub-components
+  cva-variants:
+    description: CVA for reusable style presets
+  link-wrapper:
+    description: Wrapper for consistent navigation styling
   structure:
     description: Component folder organization, exports, and props typing
 
 styling:
   nativewind:
     description: NativeWind conventions — component-based styling, semantic tokens, positioning
+
+testing:
+  file-location:
+    description: Colocate tests with source files
+  integration-tests:
+    description: Integration tests with expo-router renderRouter
+  mocking:
+    description: Minimal mock strategy for Jest
 
 typescript:
   conventions:
