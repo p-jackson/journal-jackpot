@@ -6,6 +6,9 @@ const textVariants = cva('text-text dark:text-text-dark', {
 		variant: {
 			'page-title': 'font-heading font-bold text-lg',
 			body: 'font-body',
+			'heading-lg': 'font-heading text-xl',
+			'body-sm': 'text-text-muted text-sm',
+			muted: 'text-text-muted',
 		},
 	},
 	defaultVariants: {

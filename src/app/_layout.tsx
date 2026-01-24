@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import { Text } from '../components/ui/Text';
+import { Text } from '../components/ui/text';
 import { Slot, usePathname } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
-import { Header } from '../components/ui/Header';
-import { Link } from '../components/ui/Link';
+import { Header } from '../components/ui/header';
+import { Link } from '../components/ui/link';
 import {
 	SpaceGrotesk_400Regular,
 	SpaceGrotesk_500Medium,

@@ -24,4 +24,4 @@ testing:
 
 typescript:
   conventions:
-    description: Interface vs type, optionals, unions over enums, Prettier
+    description: Kebab-case files, interface vs type, optionals, unions over enums
