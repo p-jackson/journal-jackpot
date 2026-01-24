@@ -1,2 +1,19 @@
 @import "tailwindcss" source("./src");
 @import "nativewind/theme";
+
+@theme {
+  --font-heading: 'SpaceGrotesk_600SemiBold';
+  --font-body: 'DMSans_400Regular';
+  --font-mono: 'IBMPlexMono_400Regular';
+}
+
+@theme inline {
+  --color-surface: var(--color-zinc-50);
+  --color-surface-dark: var(--color-zinc-950);
+  --color-primary: var(--color-violet-600);
+  --color-text: var(--color-zinc-900);
+  --color-text-dark: var(--color-zinc-100);
+  --color-text-muted: var(--color-zinc-500);
+  --color-border: var(--color-zinc-200);
+  --color-border-dark: var(--color-zinc-800);
+}

@@ -2,9 +2,9 @@
 
 ## Define Section Variables
 
-- **SECTION_NAME** = [Human-readable name, e.g., "Slot Machine" or "Prompt History"]
-- **SECTION_ID** = [Folder name in sections/, e.g., "slot-machine" or "prompt-history"]
-- **NN** = [Milestone number, e.g., "02" or "03" — sections start at 02 since 01 is Foundation]
+- **SECTION_NAME** = Foundation
+- **SECTION_ID** = foundation
+- **NN** = 01
 
 ---
 
