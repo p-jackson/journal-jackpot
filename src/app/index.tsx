@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { Text } from '../components/ui/text';
 import { useSlotMachine } from '../hooks/use-slot-machine';
@@ -6,6 +6,7 @@ import { SlotMachine } from '../components/slot-machine/slot-machine';
 import { SpinButton } from '../components/slot-machine/spin-button';
 import { Celebration } from '../components/slot-machine/celebration';
 import { CountdownTimer } from '../components/slot-machine/countdown-timer';
+import { useHistoryContext } from '../contexts/history-context';
 
 export default function Home() {
 	const {
@@ -17,29 +18,29 @@ export default function Home() {
 		nextSpinAt,
 		spin,
 	} = useSlotMachine();
+	const { refreshHistory } = useHistoryContext();
 
 	const [showCelebration, setShowCelebration] = useState(false);
 	const [reelWords, setReelWords] = useState<(string | null)[]>([null, null, null]);
-	const stoppedCountRef = useRef(0);
+	const [allReelsStopped, setAllReelsStopped] = useState(true);
 
 	const handleSpin = useCallback(async () => {
 		if (!canSpin || spinning) return;
 
 		setReelWords([null, null, null]);
-		stoppedCountRef.current = 0;
+		setAllReelsStopped(false);
 		await spin();
 	}, [canSpin, spinning, spin]);
 
-	const handleReelStopped = useCallback(() => {
-		stoppedCountRef.current += 1;
-		if (stoppedCountRef.current === 3) {
-			setShowCelebration(true);
-		}
+	const handleAllReelsStopped = useCallback(() => {
+		setAllReelsStopped(true);
+		setShowCelebration(true);
 	}, []);
 
 	const handleCelebrationComplete = useCallback(() => {
 		setShowCelebration(false);
-	}, []);
+		refreshHistory();
+	}, [refreshHistory]);
 
 	if (loading) {
 		return (
@@ -63,11 +64,11 @@ export default function Home() {
 					reels={reels}
 					spinning={spinning}
 					displayWords={displayWords}
-					onReelStopped={handleReelStopped}
+					onAllReelsStopped={handleAllReelsStopped}
 				/>
 			</View>
 
-			{todaysPrompt && !spinning && (
+			{todaysPrompt && allReelsStopped && (
 				<View className="mb-8 px-4">
 					<Text variant="heading-lg" className="text-center">
 						“{todaysPrompt.words.join(' ')}”
@@ -78,7 +79,7 @@ export default function Home() {
 				</View>
 			)}
 
-			{!todaysPrompt && !spinning && (
+			{!todaysPrompt && allReelsStopped && (
 				<View className="mb-8">
 					<Text variant="muted" className="text-center">
 						Tap SPIN to get today's prompt
@@ -89,10 +90,10 @@ export default function Home() {
 			<SpinButton
 				onPress={handleSpin}
 				disabled={!canSpin}
-				spinning={spinning}
+				spinning={spinning || !allReelsStopped}
 			/>
 
-			{nextSpinAt && !spinning && (
+			{nextSpinAt && allReelsStopped && (
 				<View className="mt-6">
 					<CountdownTimer targetDate={nextSpinAt} />
 				</View>

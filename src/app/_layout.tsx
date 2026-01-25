@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 import { Header } from '../components/ui/header';
 import { Link } from '../components/ui/link';
 import { DevResetButton } from '../components/ui/dev-reset-button';
-import { useHasPromptHistory } from '../hooks/use-has-prompt-history';
+import { HistoryProvider, useHistoryContext } from '../contexts/history-context';
 import { clearAllData } from '../storage/prompt-storage';
 import {
 	SpaceGrotesk_400Regular,
@@ -71,12 +71,16 @@ export default function RootLayout() {
 		]);
 	};
 
-	return <AppShell key={resetKey} onReset={handleReset} />;
+	return (
+		<HistoryProvider key={resetKey}>
+			<AppShell onReset={handleReset} />
+		</HistoryProvider>
+	);
 }
 
 function AppShell({ onReset }: { onReset: () => void }) {
 	const pathname = usePathname();
-	const { hasHistory } = useHasPromptHistory();
+	const { hasHistory } = useHistoryContext();
 
 	const isHome = pathname === '/';
 	const pageTitle = isHome ? 'Journal Jackpot' : 'History';

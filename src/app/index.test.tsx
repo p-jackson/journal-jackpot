@@ -57,6 +57,8 @@ describe('Home', () => {
 
 			await act(async () => {
 				fireEvent.press(screen.getByRole('button'));
+			});
+			await act(async () => {
 				jest.advanceTimersByTime(3000);
 			});
 
@@ -74,6 +76,8 @@ describe('Home', () => {
 
 			await act(async () => {
 				fireEvent.press(screen.getByRole('button'));
+			});
+			await act(async () => {
 				jest.advanceTimersByTime(3000);
 			});
 
@@ -92,6 +96,8 @@ describe('Home', () => {
 
 			await act(async () => {
 				fireEvent.press(screen.getByRole('button'));
+			});
+			await act(async () => {
 				jest.advanceTimersByTime(3000);
 			});
 
@@ -183,6 +189,8 @@ describe('Home', () => {
 			// First spin
 			await act(async () => {
 				fireEvent.press(button);
+			});
+			await act(async () => {
 				jest.advanceTimersByTime(3000);
 			});
 
@@ -215,6 +223,33 @@ describe('Home', () => {
 			});
 
 			expect(screen.queryByText('History')).toBeNull();
+		});
+
+		it('shows History link after first spin celebration completes', async () => {
+			renderHome();
+
+			await waitFor(() => {
+				expect(screen.getByText('SPIN')).toBeTruthy();
+			});
+
+			// No history link before spin
+			expect(screen.queryByText('History')).toBeNull();
+
+			await act(async () => {
+				fireEvent.press(screen.getByRole('button'));
+			});
+
+			// Still no history link mid-spin
+			expect(screen.queryByText('History')).toBeNull();
+
+			await act(async () => {
+				jest.advanceTimersByTime(3000);
+			});
+
+			// After celebration completes, history link appears
+			await waitFor(() => {
+				expect(screen.getByText('History')).toBeTruthy();
+			});
 		});
 	});
 

@@ -5,6 +5,7 @@ import Animated, {
   withTiming,
   withSequence,
   withRepeat,
+  cancelAnimation,
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
@@ -27,7 +28,7 @@ export function Reel({
   onStopped,
 }: ReelProps) {
   const [displayWord, setDisplayWord] = useState(
-    selectedWord || reel.words[0].text
+    selectedWord || '—'
   );
   const [cycleIndex, setCycleIndex] = useState(0);
   const opacity = useSharedValue(1);
@@ -83,9 +84,15 @@ export function Reel({
       return () => {
         clearInterval(cycleInterval);
         clearTimeout(stopTimeout);
+        cancelAnimation(opacity);
+        cancelAnimation(translateY);
+        opacity.value = 1;
+        translateY.value = 0;
       };
     } else if (selectedWord) {
       setDisplayWord(selectedWord);
+    } else {
+      setDisplayWord('—');
     }
   }, [spinning, stopDelay, selectedWord, reel.words.length, opacity, translateY, handleStopped]);
 

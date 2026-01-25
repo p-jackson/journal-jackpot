@@ -18,7 +18,10 @@ const mock = {
 	createAnimatedComponent,
 	useSharedValue: jest.fn((initial) => ({ value: initial })),
 	useAnimatedStyle: jest.fn(() => ({})),
-	withTiming: jest.fn((toValue) => toValue),
+	withTiming: jest.fn((toValue, _config, callback) => {
+		if (callback) callback(true);
+		return toValue;
+	}),
 	withSequence: jest.fn((...args) => args[args.length - 1]),
 	withDelay: jest.fn((_, animation) => animation),
 	withRepeat: jest.fn((animation) => animation),
