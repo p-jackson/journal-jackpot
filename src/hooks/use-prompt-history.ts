@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { getPromptsForHistory } from '../storage/prompt-storage';
-import type { Prompt } from '../types';
+import type { SavedPrompt } from '../types';
 
 interface UsePromptHistoryReturn {
-	prompts: Prompt[];
+	prompts: SavedPrompt[];
 	loading: boolean;
 	journeyStartDate: string | null;
 }
 
 export function usePromptHistory(): UsePromptHistoryReturn {
-	const [prompts, setPrompts] = useState<Prompt[]>([]);
+	const [prompts, setPrompts] = useState<SavedPrompt[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {

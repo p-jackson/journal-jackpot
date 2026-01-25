@@ -23,7 +23,7 @@ interface UseSlotMachineReturn {
 
 function getRandomWord(reel: Reel): string {
   const idx = Math.floor(Math.random() * reel.words.length);
-  return reel.words[idx].text;
+  return reel.words[idx];
 }
 
 function getNextMidnight(): Date {
@@ -46,7 +46,7 @@ export function useSlotMachine(): UseSlotMachineReturn {
         getTodaysPrompt(),
       ]);
 
-      setCanSpin(canSpinResult);
+      setCanSpin(existingPrompt ? canSpinResult : true);
       setTodaysPrompt(existingPrompt);
       setLoading(false);
     }

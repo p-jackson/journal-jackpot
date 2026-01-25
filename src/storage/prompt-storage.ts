@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isSameDay } from 'date-fns';
-import type { Prompt, SavedPrompt } from '../types';
+import type { SavedPrompt } from '../types';
 
 export const STORAGE_KEYS = {
 	PROMPT_HISTORY: 'journal-jackpot:prompt-history',
@@ -30,19 +30,22 @@ export async function getTodaysPrompt() {
 	const latestDate = new Date(latest.createdAt);
 	const today = new Date();
 
-	if (isSameDay(latestDate, today)) {
-		const parts = latest.text.split(' ');
-		if (parts.length !== 3) {
-			console.warn(`Prompt has ${parts.length} words, expected 3: "${latest.text}"`);
-		}
-		const words: [string, string, string] = [
-			parts[0] ?? '',
-			parts[1] ?? '',
-			parts[2] ?? '',
-		];
-		return { words, createdAt: latest.createdAt };
+	if (!isSameDay(latestDate, today)) {
+		return null;
 	}
-	return null;
+
+	const parts = latest.text.split(' ');
+	if (parts.length !== 3) {
+		console.warn(`Prompt has ${parts.length} words, expected 3: "${latest.text}"`);
+	}
+	const words: [string, string, string] = [
+		parts[0] ?? '',
+		parts[1] ?? '',
+		parts[2] ?? '',
+	];
+	// Allow respin if data is corrupted
+	if (words.some((w) => !w)) return null;
+	return { words, createdAt: latest.createdAt };
 }
 
 export async function getLastSpinDate() {
@@ -63,22 +66,9 @@ export async function canSpinToday() {
 	return !isSameDay(lastSpin, today);
 }
 
-export async function getPromptsForHistory(): Promise<Prompt[]> {
+export async function getPromptsForHistory(): Promise<SavedPrompt[]> {
 	const history = await getPromptHistory();
-	return history
-		.map((saved) => {
-			const parts = saved.text.split(' ');
-			const words: [string, string, string] = [
-				parts[0] ?? '',
-				parts[1] ?? '',
-				parts[2] ?? '',
-			];
-			return {
-				words,
-				createdAt: saved.createdAt,
-			};
-		})
-		.reverse();
+	return history.filter((s) => s.text.trim()).reverse();
 }
 
 export async function hasPromptHistory(): Promise<boolean> {

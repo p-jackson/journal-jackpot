@@ -37,6 +37,27 @@ describe('useSlotMachine', () => {
       expect(result.current.todaysPrompt).toBeNull();
     });
 
+    it('allows re-spin when stored prompt is corrupted', async () => {
+      const today = new Date();
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify([{ text: '  ', createdAt: today.toISOString() }])
+      );
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.LAST_SPIN_DATE,
+        today.toISOString()
+      );
+
+      const { result } = renderHook(() => useSlotMachine());
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      expect(result.current.todaysPrompt).toBeNull();
+      expect(result.current.canSpin).toBe(true);
+    });
+
     it('loads existing prompt if spun today', async () => {
       const today = new Date();
       // Storage uses SavedPrompt format (text string)

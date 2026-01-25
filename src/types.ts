@@ -1,12 +1,6 @@
-interface Word {
-	id: string;
-	text: string;
-}
-
 interface Reel {
-	id: string;
 	position: '1' | '2' | '3';
-	words: Word[];
+	words: string[];
 }
 
 interface Prompt {
@@ -25,4 +19,4 @@ interface SlotMachineState {
 	nextSpinAt: string | null;
 }
 
-export type { Word, Reel, Prompt, SavedPrompt, SlotMachineState };
+export type { Reel, Prompt, SavedPrompt, SlotMachineState };

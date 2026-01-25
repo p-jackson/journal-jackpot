@@ -1,10 +1,9 @@
 import { View, ScrollView } from 'react-native';
 import { Text } from '../ui/text';
-import type { Prompt } from '../../types';
+import type { SavedPrompt } from '../../types';
 
 interface PromptHistoryProps {
-	prompts: Prompt[];
-	journeyStartDate: string | null;
+	prompts: SavedPrompt[];
 }
 
 function formatDate(dateString: string): string {
@@ -40,7 +39,7 @@ function EmptyState() {
 }
 
 interface PromptCardProps {
-	prompt: Prompt;
+	prompt: SavedPrompt;
 	isLast: boolean;
 }
 
@@ -58,14 +57,14 @@ function PromptCard({ prompt, isLast }: PromptCardProps) {
 					{formatDate(prompt.createdAt)}
 				</Text>
 				<Text className="font-mono text-base">
-					{prompt.words.join(' ')}
+					{prompt.text}
 				</Text>
 			</View>
 		</View>
 	);
 }
 
-export function PromptHistory({ prompts, journeyStartDate }: PromptHistoryProps) {
+export function PromptHistory({ prompts }: PromptHistoryProps) {
 	if (prompts.length === 0) {
 		return <EmptyState />;
 	}

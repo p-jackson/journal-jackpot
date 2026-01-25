@@ -178,6 +178,40 @@ describe('Home', () => {
 		});
 	});
 
+	describe('corrupted prompt recovery', () => {
+		it('allows re-spin when stored prompt has empty words', async () => {
+			const today = new Date();
+			await AsyncStorage.setItem(
+				STORAGE_KEYS.PROMPT_HISTORY,
+				JSON.stringify([{ text: '  ', createdAt: today.toISOString() }])
+			);
+			await AsyncStorage.setItem(
+				STORAGE_KEYS.LAST_SPIN_DATE,
+				today.toISOString()
+			);
+
+			renderHome();
+
+			await waitFor(() => {
+				expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
+			});
+
+			const button = screen.getByRole('button');
+			expect(button).toBeEnabled();
+
+			await act(async () => {
+				fireEvent.press(button);
+			});
+			await act(async () => {
+				jest.advanceTimersByTime(3000);
+			});
+
+			await waitFor(() => {
+				expect(screen.getByText(/until next spin/)).toBeTruthy();
+			});
+		});
+	});
+
 	describe('rapid tap prevention', () => {
 		it('prevents multiple spins', async () => {
 			renderHome();

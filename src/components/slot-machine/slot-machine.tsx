@@ -39,7 +39,7 @@ export function SlotMachine({
 	return (
 		<ReelWindow>
 			{reels.map((reel, index) => (
-				<View key={reel.id} style={{ flex: 1, flexDirection: 'row' }}>
+				<View key={reel.position} style={{ flex: 1, flexDirection: 'row' }}>
 					{index > 0 && <ReelSeparator />}
 					<Reel
 						reel={reel}

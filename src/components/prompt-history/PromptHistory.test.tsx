@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import { PromptHistory } from './PromptHistory';
-import type { Prompt } from '../../types';
+import type { SavedPrompt } from '../../types';
 
 describe('PromptHistory', () => {
 	describe('empty state', () => {
@@ -11,10 +11,10 @@ describe('PromptHistory', () => {
 	});
 
 	describe('with prompts', () => {
-		const mockPrompts: Prompt[] = [
-			{ words: ['a', 'b', 'c'], createdAt: '2024-01-17T10:00:00.000Z' },
-			{ words: ['d', 'e', 'f'], createdAt: '2024-01-16T10:00:00.000Z' },
-			{ words: ['g', 'h', 'i'], createdAt: '2024-01-15T10:00:00.000Z' },
+		const mockPrompts: SavedPrompt[] = [
+			{ text: 'a b c', createdAt: '2024-01-17T10:00:00.000Z' },
+			{ text: 'd e f', createdAt: '2024-01-16T10:00:00.000Z' },
+			{ text: 'g h i', createdAt: '2024-01-15T10:00:00.000Z' },
 		];
 
 		it('skips latest prompt and renders past prompts', () => {
@@ -62,10 +62,10 @@ describe('PromptHistory', () => {
 		}
 
 		// Each date test needs 2 prompts: a newest (skipped) + the one under test
-		function makePrompts(createdAt: string): Prompt[] {
+		function makePrompts(createdAt: string): SavedPrompt[] {
 			return [
-				{ words: ['x', 'y', 'z'], createdAt: getDateString(0) }, // newest, skipped
-				{ words: ['a', 'b', 'c'], createdAt },
+				{ text: 'x y z', createdAt: getDateString(0) }, // newest, skipped
+				{ text: 'a b c', createdAt },
 			];
 		}
 

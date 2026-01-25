@@ -98,7 +98,7 @@ export function Reel({
 
   useEffect(() => {
     if (spinning) {
-      setDisplayWord(reel.words[cycleIndex].text);
+      setDisplayWord(reel.words[cycleIndex]);
     }
   }, [cycleIndex, spinning, reel.words]);
 

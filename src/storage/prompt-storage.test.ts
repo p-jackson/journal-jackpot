@@ -108,6 +108,21 @@ describe('promptStorage', () => {
       expect(result).toBeNull();
     });
 
+    it('returns null for corrupted prompt with empty words', async () => {
+      const today = new Date();
+      const saved: SavedPrompt = {
+        text: '  ',
+        createdAt: today.toISOString(),
+      };
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify([saved])
+      );
+
+      const result = await getTodaysPrompt();
+      expect(result).toBeNull();
+    });
+
     it('returns prompt when created today', async () => {
       const today = new Date();
       const saved: SavedPrompt = {
@@ -190,7 +205,24 @@ describe('promptStorage', () => {
       expect(prompts[2].createdAt).toBe('2024-01-15T10:00:00.000Z');
     });
 
-    it('converts SavedPrompt to Prompt', async () => {
+    it('filters out corrupted entries with empty text', async () => {
+      const prompts: SavedPrompt[] = [
+        { text: 'a b c', createdAt: '2024-01-15T10:00:00.000Z' },
+        { text: '  ', createdAt: '2024-01-16T10:00:00.000Z' },
+        { text: 'd e f', createdAt: '2024-01-17T10:00:00.000Z' },
+      ];
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify(prompts)
+      );
+
+      const result = await getPromptsForHistory();
+      expect(result).toHaveLength(2);
+      expect(result[0].text).toBe('d e f');
+      expect(result[1].text).toBe('a b c');
+    });
+
+    it('returns SavedPrompt objects as-is', async () => {
       const saved: SavedPrompt = {
         text: 'word1 word2 word3',
         createdAt: '2024-01-15T10:00:00.000Z',
@@ -201,12 +233,7 @@ describe('promptStorage', () => {
       );
 
       const prompts = await getPromptsForHistory();
-      expect(prompts).toEqual([
-        {
-          words: ['word1', 'word2', 'word3'],
-          createdAt: '2024-01-15T10:00:00.000Z',
-        },
-      ]);
+      expect(prompts).toEqual([saved]);
     });
   });
 
