@@ -83,7 +83,7 @@ export async function getPromptsForHistory(): Promise<Prompt[]> {
 
 export async function hasPromptHistory(): Promise<boolean> {
 	const history = await getPromptHistory();
-	return history.length > 0;
+	return history.length >= 2;
 }
 
 export async function clearAllData() {

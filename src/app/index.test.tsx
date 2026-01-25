@@ -225,31 +225,24 @@ describe('Home', () => {
 			expect(screen.queryByText('History')).toBeNull();
 		});
 
-		it('shows History link after first spin celebration completes', async () => {
+		it('hides History link after first spin (only 1 prompt)', async () => {
 			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
 			});
 
-			// No history link before spin
 			expect(screen.queryByText('History')).toBeNull();
 
 			await act(async () => {
 				fireEvent.press(screen.getByRole('button'));
 			});
-
-			// Still no history link mid-spin
-			expect(screen.queryByText('History')).toBeNull();
-
 			await act(async () => {
 				jest.advanceTimersByTime(3000);
 			});
 
-			// After celebration completes, history link appears
-			await waitFor(() => {
-				expect(screen.getByText('History')).toBeTruthy();
-			});
+			// Still no history link — need 2+ prompts
+			expect(screen.queryByText('History')).toBeNull();
 		});
 	});
 
@@ -263,13 +256,13 @@ describe('Home', () => {
 		});
 
 		it('clears data and refreshes UI on reset', async () => {
-			const prompt: SavedPrompt = {
-				text: 'test prompt here',
-				createdAt: '2024-01-15T10:00:00.000Z',
-			};
+			const prompts: SavedPrompt[] = [
+				{ text: 'older prompt too', createdAt: '2024-01-14T10:00:00.000Z' },
+				{ text: 'test prompt here', createdAt: '2024-01-15T10:00:00.000Z' },
+			];
 			await AsyncStorage.setItem(
 				STORAGE_KEYS.PROMPT_HISTORY,
-				JSON.stringify([prompt])
+				JSON.stringify(prompts)
 			);
 
 			// Auto-confirm the alert

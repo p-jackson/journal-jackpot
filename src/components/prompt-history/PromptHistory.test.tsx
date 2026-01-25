@@ -17,36 +17,27 @@ describe('PromptHistory', () => {
 			{ words: ['g', 'h', 'i'], createdAt: '2024-01-15T10:00:00.000Z' },
 		];
 
-		it('renders singular prompt count', () => {
-			render(
-				<PromptHistory
-					prompts={[mockPrompts[0]]}
-					journeyStartDate={mockPrompts[0].createdAt}
-				/>
-			);
-			expect(screen.getByText(/1 prompt/i)).toBeTruthy();
-		});
-
-		it('renders plural prompt count', () => {
+		it('skips latest prompt and renders past prompts', () => {
 			render(
 				<PromptHistory
 					prompts={mockPrompts}
 					journeyStartDate={mockPrompts[2].createdAt}
 				/>
 			);
-			expect(screen.getByText(/3 prompts/i)).toBeTruthy();
+			expect(screen.queryByText('a b c')).toBeNull();
+			expect(screen.getByText('d e f')).toBeTruthy();
+			expect(screen.getByText('g h i')).toBeTruthy();
 		});
 
-		it('renders all prompts', () => {
+		it('uses space-separated words', () => {
 			render(
 				<PromptHistory
 					prompts={mockPrompts}
 					journeyStartDate={mockPrompts[2].createdAt}
 				/>
 			);
-			expect(screen.getByText('a · b · c')).toBeTruthy();
-			expect(screen.getByText('d · e · f')).toBeTruthy();
-			expect(screen.getByText('g · h · i')).toBeTruthy();
+			expect(screen.queryByText(/·/)).toBeNull();
+			expect(screen.getByText('d e f')).toBeTruthy();
 		});
 	});
 
@@ -70,37 +61,42 @@ describe('PromptHistory', () => {
 			return date.toISOString();
 		}
 
+		// Each date test needs 2 prompts: a newest (skipped) + the one under test
+		function makePrompts(createdAt: string): Prompt[] {
+			return [
+				{ words: ['x', 'y', 'z'], createdAt: getDateString(0) }, // newest, skipped
+				{ words: ['a', 'b', 'c'], createdAt },
+			];
+		}
+
 		it('formats today as "Today"', () => {
-			const createdAt = getDateString(0);
-			const prompts: Prompt[] = [{ words: ['a', 'b', 'c'], createdAt }];
+			const prompts = makePrompts(getDateString(0));
 			render(
 				<PromptHistory
 					prompts={prompts}
-					journeyStartDate={prompts[0].createdAt}
+					journeyStartDate={prompts[1].createdAt}
 				/>
 			);
 			expect(screen.getByText('Today')).toBeTruthy();
 		});
 
 		it('formats yesterday as "Yesterday"', () => {
-			const createdAt = getDateString(1);
-			const prompts: Prompt[] = [{ words: ['a', 'b', 'c'], createdAt }];
+			const prompts = makePrompts(getDateString(1));
 			render(
 				<PromptHistory
 					prompts={prompts}
-					journeyStartDate={prompts[0].createdAt}
+					journeyStartDate={prompts[1].createdAt}
 				/>
 			);
 			expect(screen.getByText('Yesterday')).toBeTruthy();
 		});
 
 		it('formats 3 days ago as "3 days ago"', () => {
-			const createdAt = getDateString(3);
-			const prompts: Prompt[] = [{ words: ['a', 'b', 'c'], createdAt }];
+			const prompts = makePrompts(getDateString(3));
 			render(
 				<PromptHistory
 					prompts={prompts}
-					journeyStartDate={prompts[0].createdAt}
+					journeyStartDate={prompts[1].createdAt}
 				/>
 			);
 			expect(screen.getByText('3 days ago')).toBeTruthy();
@@ -108,14 +104,13 @@ describe('PromptHistory', () => {
 
 		it('formats older dates as weekday + day', () => {
 			const createdAt = getDateString(9);
-			const prompts: Prompt[] = [{ words: ['a', 'b', 'c'], createdAt }];
+			const prompts = makePrompts(createdAt);
 			render(
 				<PromptHistory
 					prompts={prompts}
-					journeyStartDate={prompts[0].createdAt}
+					journeyStartDate={prompts[1].createdAt}
 				/>
 			);
-			// Check that we get a weekday abbreviation followed by a number
 			const date = new Date(createdAt);
 			const expected = `${date.toLocaleDateString('en-US', { weekday: 'short' })} ${date.getDate()}`;
 			expect(screen.getByText(expected)).toBeTruthy();

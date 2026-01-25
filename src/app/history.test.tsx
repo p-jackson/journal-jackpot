@@ -21,21 +21,22 @@ describe('History', () => {
 	});
 
 	it('shows loading then content', async () => {
-		const prompt: SavedPrompt = {
-			text: 'a b c',
-			createdAt: '2024-01-15T10:00:00.000Z',
-		};
+		const prompts: SavedPrompt[] = [
+			{ text: 'd e f', createdAt: '2024-01-14T10:00:00.000Z' },
+			{ text: 'a b c', createdAt: '2024-01-15T10:00:00.000Z' },
+		];
 		await AsyncStorage.setItem(
 			STORAGE_KEYS.PROMPT_HISTORY,
-			JSON.stringify([prompt])
+			JSON.stringify(prompts)
 		);
 
 		renderHistory();
 
 		expect(screen.getByTestId('activity-indicator')).toBeTruthy();
 
+		// Latest prompt (a b c) skipped; older one shown
 		await waitFor(() => {
-			expect(screen.getByText('a · b · c')).toBeTruthy();
+			expect(screen.getByText('d e f')).toBeTruthy();
 		});
 	});
 
@@ -48,13 +49,13 @@ describe('History', () => {
 	});
 
 	it('navigates from home to history and back', async () => {
-		const prompt: SavedPrompt = {
-			text: 'test prompt here',
-			createdAt: '2024-01-15T10:00:00.000Z',
-		};
+		const prompts: SavedPrompt[] = [
+			{ text: 'older prompt too', createdAt: '2024-01-14T10:00:00.000Z' },
+			{ text: 'test prompt here', createdAt: '2024-01-15T10:00:00.000Z' },
+		];
 		await AsyncStorage.setItem(
 			STORAGE_KEYS.PROMPT_HISTORY,
-			JSON.stringify([prompt])
+			JSON.stringify(prompts)
 		);
 
 		renderRouter(
@@ -70,8 +71,9 @@ describe('History', () => {
 
 		fireEvent.press(screen.getByText('History'));
 
+		// Latest skipped; older prompt shown
 		await waitFor(() => {
-			expect(screen.getByText('test · prompt · here')).toBeTruthy();
+			expect(screen.getByText('older prompt too')).toBeTruthy();
 		});
 		expect(screen.getByText('Back')).toBeTruthy();
 

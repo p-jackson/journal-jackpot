@@ -48,7 +48,7 @@ function PromptCard({ prompt, isLast }: PromptCardProps) {
 	return (
 		<View className="flex-row">
 			{/* Timeline connector */}
-			<View className="items-center mr-4">
+			<View className="items-center mr-4 mt-0.5">
 				<View className="w-3 h-3 rounded-full bg-primary" />
 				{!isLast && <View className="flex-1 w-0.5 bg-border dark:bg-border-dark" />}
 			</View>
@@ -57,11 +57,9 @@ function PromptCard({ prompt, isLast }: PromptCardProps) {
 				<Text variant="body-sm" className="mb-1">
 					{formatDate(prompt.createdAt)}
 				</Text>
-				<View className="bg-white dark:bg-zinc-900 rounded-lg p-4 border border-border dark:border-border-dark">
-					<Text className="font-mono text-base">
-						{prompt.words.join(' · ')}
-					</Text>
-				</View>
+				<Text className="font-mono text-base">
+					{prompt.words.join(' ')}
+				</Text>
 			</View>
 		</View>
 	);
@@ -72,18 +70,15 @@ export function PromptHistory({ prompts, journeyStartDate }: PromptHistoryProps)
 		return <EmptyState />;
 	}
 
-	const promptCount = prompts.length === 1 ? '1 prompt' : `${prompts.length} prompts`;
+	const pastPrompts = prompts.slice(1);
 
 	return (
 		<ScrollView className="flex-1" contentContainerClassName="px-4 py-6">
-			<Text variant="muted" className="mb-4 text-center">
-				{promptCount} since your journey began
-			</Text>
-			{prompts.map((prompt, index) => (
+			{pastPrompts.map((prompt, index) => (
 				<PromptCard
 					key={prompt.createdAt}
 					prompt={prompt}
-					isLast={index === prompts.length - 1}
+					isLast={index === pastPrompts.length - 1}
 				/>
 			))}
 		</ScrollView>

@@ -234,7 +234,7 @@ describe('promptStorage', () => {
       expect(result).toBe(false);
     });
 
-    it('returns true when history exists', async () => {
+    it('returns false with only one prompt', async () => {
       const prompt: SavedPrompt = {
         text: 'a b c',
         createdAt: '2024-01-15T10:00:00.000Z',
@@ -242,6 +242,20 @@ describe('promptStorage', () => {
       await AsyncStorage.setItem(
         STORAGE_KEYS.PROMPT_HISTORY,
         JSON.stringify([prompt])
+      );
+
+      const result = await hasPromptHistory();
+      expect(result).toBe(false);
+    });
+
+    it('returns true with two or more prompts', async () => {
+      const prompts: SavedPrompt[] = [
+        { text: 'a b c', createdAt: '2024-01-15T10:00:00.000Z' },
+        { text: 'd e f', createdAt: '2024-01-16T10:00:00.000Z' },
+      ];
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify(prompts)
       );
 
       const result = await hasPromptHistory();
