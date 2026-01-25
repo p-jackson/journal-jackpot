@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Text } from 'react-native';
+import { Text } from '../ui/text';
 
 interface CountdownTimerProps {
   targetDate: string;
@@ -36,7 +36,7 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
   }, [targetDate]);
 
   return (
-    <Text style={{ color: '#71717a', fontSize: 13, textAlign: 'center' }}>
+    <Text variant="muted" className="text-xs text-center">
       {formatTimeLeft(timeLeft)} until next spin
     </Text>
   );

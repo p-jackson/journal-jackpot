@@ -86,7 +86,8 @@ function AppShell({ onReset }: { onReset: () => void }) {
 	const pageTitle = isHome ? 'Journal Jackpot' : 'History';
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} className="bg-surface dark:bg-surface-dark">
+		<View className="flex-1 bg-surface dark:bg-surface-dark">
+		<SafeAreaView style={{ flex: 1 }}>
 			{!isHome && (
 				<Header>
 					<Header.Left>
@@ -115,5 +116,6 @@ function AppShell({ onReset }: { onReset: () => void }) {
 				<Slot />
 			</View>
 		</SafeAreaView>
+		</View>
 	);
 }

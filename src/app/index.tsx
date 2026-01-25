@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
+import { Text } from '../components/ui/text';
 import { useSlotMachine } from '../hooks/use-slot-machine';
 import { SlotMachine } from '../components/slot-machine/slot-machine';
 import { SpinButton } from '../components/slot-machine/spin-button';
@@ -90,13 +91,13 @@ export default function Home() {
 
 			<View style={{ marginTop: 16, alignItems: 'center' }}>
 				{!todaysPrompt && allReelsStopped ? (
-					<Text style={{ color: '#71717a', fontSize: 14, textAlign: 'center' }}>
+					<Text variant="muted" className="text-sm text-center">
 						Tap SPIN to get today's prompt
 					</Text>
 				) : nextSpinAt && allReelsStopped ? (
 					<CountdownTimer targetDate={nextSpinAt} />
 				) : (
-					<Text style={{ fontSize: 14 }}>{'\u00A0'}</Text>
+					<Text className="text-sm">{'\u00A0'}</Text>
 				)}
 			</View>
 		</View>

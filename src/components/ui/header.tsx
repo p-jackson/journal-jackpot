@@ -2,7 +2,7 @@ import { View } from 'react-native';
 
 function HeaderRoot({ children }: { children: React.ReactNode }) {
 	return (
-		<View className="bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark">
+		<View>
 			<View className="px-4 h-14 flex flex-row items-center">
 				{children}
 			</View>
