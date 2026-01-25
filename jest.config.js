@@ -7,6 +7,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.css$': '<rootDir>/__mocks__/styleMock.js',
+    'react-native-reanimated/mock': '<rootDir>/__mocks__/react-native-reanimated-impl.js',
   },
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
   testMatch: ['**/*.test.{ts,tsx}'],

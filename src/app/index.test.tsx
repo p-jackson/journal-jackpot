@@ -1,12 +1,25 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
+jest.unmock('expo-router');
+
+import { Alert } from 'react-native';
+import { renderRouter, screen, fireEvent, waitFor, act } from 'expo-router/testing-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './index';
+import History from './history';
+import RootLayout from './_layout';
 import { STORAGE_KEYS } from '../storage/prompt-storage';
 import type { SavedPrompt } from '../types';
+
+function renderHome() {
+	return renderRouter(
+		{ index: Home, history: History, _layout: RootLayout },
+		{ initialUrl: '/' }
+	);
+}
 
 describe('Home', () => {
 	beforeEach(async () => {
 		await AsyncStorage.clear();
+		jest.restoreAllMocks();
 		jest.useFakeTimers();
 	});
 
@@ -16,7 +29,7 @@ describe('Home', () => {
 
 	describe('first spin of the day', () => {
 		it('shows enabled spin button for new user', async () => {
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.queryByTestId('activity-indicator')).toBeNull();
@@ -28,7 +41,7 @@ describe('Home', () => {
 		});
 
 		it('shows placeholder text for new user', async () => {
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
@@ -36,7 +49,7 @@ describe('Home', () => {
 		});
 
 		it('generates and displays prompt after spin', async () => {
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -53,7 +66,7 @@ describe('Home', () => {
 		});
 
 		it('disables button after spin', async () => {
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -71,7 +84,7 @@ describe('Home', () => {
 		});
 
 		it('shows countdown timer after spin', async () => {
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -104,10 +117,10 @@ describe('Home', () => {
 				today.toISOString()
 			);
 
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
-				expect(screen.getByText('“favourite childhood sandwich”')).toBeTruthy();
+				expect(screen.getByText(/favourite childhood sandwich/)).toBeTruthy();
 			});
 		});
 
@@ -126,7 +139,7 @@ describe('Home', () => {
 				today.toISOString()
 			);
 
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				const button = screen.getByRole('button');
@@ -149,7 +162,7 @@ describe('Home', () => {
 				today.toISOString()
 			);
 
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText(/until next spin/)).toBeTruthy();
@@ -159,7 +172,7 @@ describe('Home', () => {
 
 	describe('rapid tap prevention', () => {
 		it('prevents multiple spins', async () => {
-			render(<Home />);
+			renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -190,6 +203,63 @@ describe('Home', () => {
 			const stored = await AsyncStorage.getItem(STORAGE_KEYS.PROMPT_HISTORY);
 			const history = JSON.parse(stored!);
 			expect(history).toHaveLength(1);
+		});
+	});
+
+	describe('navigation', () => {
+		it('hides History link when no prompts exist', async () => {
+			renderHome();
+
+			await waitFor(() => {
+				expect(screen.getByText('Journal Jackpot')).toBeTruthy();
+			});
+
+			expect(screen.queryByText('History')).toBeNull();
+		});
+	});
+
+	describe('reset', () => {
+		it('shows reset button on home screen', async () => {
+			renderHome();
+
+			await waitFor(() => {
+				expect(screen.getByText('Reset')).toBeTruthy();
+			});
+		});
+
+		it('clears data and refreshes UI on reset', async () => {
+			const prompt: SavedPrompt = {
+				text: 'test prompt here',
+				createdAt: '2024-01-15T10:00:00.000Z',
+			};
+			await AsyncStorage.setItem(
+				STORAGE_KEYS.PROMPT_HISTORY,
+				JSON.stringify([prompt])
+			);
+
+			// Auto-confirm the alert
+			jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
+				const destructive = buttons?.find((b) => b.style === 'destructive');
+				destructive?.onPress?.();
+			});
+
+			renderHome();
+
+			// History link visible before reset
+			await waitFor(() => {
+				expect(screen.getByText('History')).toBeTruthy();
+			});
+
+			fireEvent.press(screen.getByText('Reset'));
+
+			// After reset, History link should disappear
+			await waitFor(() => {
+				expect(screen.queryByText('History')).toBeNull();
+			});
+
+			// Storage should be empty
+			const stored = await AsyncStorage.getItem(STORAGE_KEYS.PROMPT_HISTORY);
+			expect(stored).toBeNull();
 		});
 	});
 });

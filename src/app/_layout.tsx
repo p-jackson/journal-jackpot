@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
-import { View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, View } from 'react-native';
 import { Text } from '../components/ui/text';
 import { Slot, usePathname } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Header } from '../components/ui/header';
 import { Link } from '../components/ui/link';
+import { DevResetButton } from '../components/ui/dev-reset-button';
 import { useHasPromptHistory } from '../hooks/use-has-prompt-history';
+import { clearAllData } from '../storage/prompt-storage';
 import {
 	SpaceGrotesk_400Regular,
 	SpaceGrotesk_500Medium,
@@ -43,8 +45,7 @@ export default function RootLayout() {
 		IBMPlexMono_500Medium,
 		IBMPlexMono_600SemiBold,
 	});
-	const pathname = usePathname();
-	const { hasHistory } = useHasPromptHistory();
+	const [resetKey, setResetKey] = useState(0);
 
 	useEffect(() => {
 		if (fontsLoaded || fontError) {
@@ -56,6 +57,27 @@ export default function RootLayout() {
 		return null;
 	}
 
+	const handleReset = () => {
+		Alert.alert('Reset', 'Clear all data?', [
+			{ text: 'Cancel', style: 'cancel' },
+			{
+				text: 'Reset',
+				style: 'destructive',
+				onPress: async () => {
+					await clearAllData();
+					setResetKey((k) => k + 1);
+				},
+			},
+		]);
+	};
+
+	return <AppShell key={resetKey} onReset={handleReset} />;
+}
+
+function AppShell({ onReset }: { onReset: () => void }) {
+	const pathname = usePathname();
+	const { hasHistory } = useHasPromptHistory();
+
 	const isHome = pathname === '/';
 	const pageTitle = isHome ? 'Journal Jackpot' : 'History';
 
@@ -63,6 +85,7 @@ export default function RootLayout() {
 		<SafeAreaView style={{ flex: 1 }} className="bg-surface dark:bg-surface-dark">
 			<Header>
 				<Header.Left>
+					{__DEV__ && isHome && <DevResetButton onPress={onReset} />}
 					{!isHome && (
 						<Link href="back" label="Back" icon="chevron-back" />
 					)}

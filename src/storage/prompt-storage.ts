@@ -85,3 +85,7 @@ export async function hasPromptHistory(): Promise<boolean> {
 	const history = await getPromptHistory();
 	return history.length > 0;
 }
+
+export async function clearAllData() {
+	await AsyncStorage.clear();
+}

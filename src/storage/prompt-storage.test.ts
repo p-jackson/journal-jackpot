@@ -8,6 +8,7 @@ import {
   getLastSpinDate,
   setLastSpinDate,
   canSpinToday,
+  clearAllData,
   STORAGE_KEYS,
 } from './prompt-storage';
 import type { SavedPrompt } from '../types';
@@ -206,6 +207,24 @@ describe('promptStorage', () => {
           createdAt: '2024-01-15T10:00:00.000Z',
         },
       ]);
+    });
+  });
+
+  describe('clearAllData', () => {
+    it('clears all stored data', async () => {
+      const prompt: SavedPrompt = {
+        text: 'a b c',
+        createdAt: '2024-01-15T10:00:00.000Z',
+      };
+      await savePrompt(prompt);
+      await setLastSpinDate(new Date('2024-01-15T10:00:00.000Z'));
+
+      await clearAllData();
+
+      const history = await getPromptHistory();
+      expect(history).toEqual([]);
+      const lastSpin = await getLastSpinDate();
+      expect(lastSpin).toBeNull();
     });
   });
 
