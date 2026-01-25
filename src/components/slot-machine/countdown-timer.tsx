@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Text } from '../ui/text';
+import { useState, useEffect } from "react";
+import { Text } from "../ui/text";
 
 interface CountdownTimerProps {
   targetDate: string;
 }
 
 function formatTimeLeft(ms: number): string {
-  if (ms <= 0) return '0m';
+  if (ms <= 0) return "0m";
 
   const hours = Math.floor(ms / (1000 * 60 * 60));
   const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
 
   if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return `${String(hours)}h ${String(minutes)}m`;
   }
-  return `${minutes}m`;
+  return `${String(minutes)}m`;
 }
 
 export function CountdownTimer({ targetDate }: CountdownTimerProps) {
@@ -32,7 +32,9 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
       }
     }, 60000); // Update every minute
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [targetDate]);
 
   return (

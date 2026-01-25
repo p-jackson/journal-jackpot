@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { useEffect } from "react";
+import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   withDelay,
   withSequence,
-  runOnJS,
   Easing,
-} from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+import { Ionicons } from "@expo/vector-icons";
 
 interface CelebrationProps {
   visible: boolean;
@@ -33,26 +33,26 @@ function Sparkle({ delay, x, y, size }: SparkleProps) {
       delay,
       withSequence(
         withTiming(1.2, { duration: 300, easing: Easing.out(Easing.back(2)) }),
-        withTiming(0, { duration: 400 })
-      )
+        withTiming(0, { duration: 400 }),
+      ),
     );
     opacity.value = withDelay(
       delay,
       withSequence(
         withTiming(1, { duration: 200 }),
-        withDelay(300, withTiming(0, { duration: 200 }))
-      )
+        withDelay(300, withTiming(0, { duration: 200 })),
+      ),
     );
     rotation.value = withDelay(
       delay,
-      withTiming(180, { duration: 700, easing: Easing.out(Easing.ease) })
+      withTiming(180, { duration: 700, easing: Easing.out(Easing.ease) }),
     );
   }, [delay, scale, opacity, rotation]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { scale: scale.value },
-      { rotate: `${rotation.value}deg` },
+      { rotate: `${String(rotation.value)}deg` },
     ],
     opacity: opacity.value,
   }));
@@ -61,7 +61,7 @@ function Sparkle({ delay, x, y, size }: SparkleProps) {
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           left: x,
           top: y,
         },
@@ -82,12 +82,13 @@ export function Celebration({ visible, onComplete }: CelebrationProps) {
         withTiming(1, { duration: 200 }),
         withDelay(
           2500,
-          withTiming(0, { duration: 300 }, () => {
-            if (onComplete) {
-              runOnJS(onComplete)();
+          withTiming(0, { duration: 300 }, (finished) => {
+            "worklet";
+            if (finished && onComplete) {
+              scheduleOnRN(onComplete);
             }
-          })
-        )
+          }),
+        ),
       );
     } else {
       containerOpacity.value = 0;

@@ -1,9 +1,9 @@
-import { PromptHistory } from '../components/prompt-history/PromptHistory';
-import { usePromptStorage } from '../contexts/prompt-storage-context';
+import { PromptHistory } from "../components/prompt-history/PromptHistory";
+import { usePromptStorage } from "../contexts/prompt-storage-context";
 
 export default function History() {
-	const [history] = usePromptStorage();
-	const prompts = history.filter((p) => p.text.trim()).reverse();
+  const [history] = usePromptStorage();
+  const prompts = history.filter((p) => p.text.trim()).reverse();
 
-	return <PromptHistory prompts={prompts} />;
+  return <PromptHistory prompts={prompts} />;
 }

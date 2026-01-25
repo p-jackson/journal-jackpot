@@ -1,322 +1,324 @@
-jest.unmock('expo-router');
+jest.unmock("expo-router");
 
-import { Alert } from 'react-native';
+import { Alert } from "react-native";
 import {
-	renderRouter,
-	screen,
-	fireEvent,
-	waitFor,
-	act,
-} from 'expo-router/testing-library';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Home from './index';
-import History from './history';
-import RootLayout from './_layout';
-import type { SavedPrompt } from '../types';
+  renderRouter,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "expo-router/testing-library";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Home from "./index";
+import History from "./history";
+import RootLayout from "./_layout";
+import type { SavedPrompt } from "../types";
 
-const STORAGE_KEY = 'journal-jackpot:prompt-history';
+const STORAGE_KEY = "journal-jackpot:prompt-history";
 
 async function renderHome() {
-	const result = renderRouter(
-		{ index: Home, history: History, _layout: RootLayout },
-		{ initialUrl: '/' }
-	);
-	// Flush navigation effects to avoid act() warnings
-	await act(async () => {});
-	return result;
+  const result = renderRouter(
+    { index: Home, history: History, _layout: RootLayout },
+    { initialUrl: "/" },
+  );
+  // Flush navigation effects to avoid act() warnings
+  await act(async () => {
+    /* flush */
+  });
+  return result;
 }
 
-describe('Home', () => {
-	beforeEach(async () => {
-		await AsyncStorage.clear();
-		jest.restoreAllMocks();
-		jest.useFakeTimers();
-	});
+describe("Home", () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+    jest.restoreAllMocks();
+    jest.useFakeTimers();
+  });
 
-	afterEach(() => {
-		jest.useRealTimers();
-	});
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
-	describe('first spin of the day', () => {
-		it('shows enabled spin button for new user', async () => {
-			await renderHome();
+  describe("first spin of the day", () => {
+    it("shows enabled spin button for new user", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.queryByTestId('activity-indicator')).toBeNull();
-			});
+      await waitFor(() => {
+        expect(screen.queryByTestId("activity-indicator")).toBeNull();
+      });
 
-			const button = screen.getByRole('button');
-			expect(button).toBeEnabled();
-			expect(screen.getByText('SPIN')).toBeTruthy();
-		});
+      const button = screen.getByRole("button");
+      expect(button).toBeEnabled();
+      expect(screen.getByText("SPIN")).toBeTruthy();
+    });
 
-		it('shows placeholder text for new user', async () => {
-			await renderHome();
+    it("shows placeholder text for new user", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
-			});
-		});
+      await waitFor(() => {
+        expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
+      });
+    });
 
-		it('generates and displays prompt after spin', async () => {
-			await renderHome();
+    it("generates and displays prompt after spin", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('SPIN')).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("SPIN")).toBeTruthy();
+      });
 
-			await act(async () => {
-				fireEvent.press(screen.getByRole('button'));
-			});
-			await act(async () => {
-				jest.advanceTimersByTime(3000);
-			});
+      await act(async () => {
+        fireEvent.press(screen.getByRole("button"));
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
 
-			await waitFor(() => {
-				expect(screen.getByText(/until next spin/)).toBeTruthy();
-			});
-		});
+      await waitFor(() => {
+        expect(screen.getByText(/until next spin/)).toBeTruthy();
+      });
+    });
 
-		it('disables button after spin', async () => {
-			await renderHome();
+    it("disables button after spin", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('SPIN')).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("SPIN")).toBeTruthy();
+      });
 
-			await act(async () => {
-				fireEvent.press(screen.getByRole('button'));
-			});
-			await act(async () => {
-				jest.advanceTimersByTime(3000);
-			});
+      await act(async () => {
+        fireEvent.press(screen.getByRole("button"));
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
 
-			await waitFor(() => {
-				const button = screen.getByRole('button');
-				expect(button.props.accessibilityState?.disabled).toBe(true);
-			});
-		});
+      await waitFor(() => {
+        const button = screen.getByRole("button");
+        expect(button.props.accessibilityState?.disabled).toBe(true);
+      });
+    });
 
-		it('shows countdown timer after spin', async () => {
-			await renderHome();
+    it("shows countdown timer after spin", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('SPIN')).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("SPIN")).toBeTruthy();
+      });
 
-			await act(async () => {
-				fireEvent.press(screen.getByRole('button'));
-			});
-			await act(async () => {
-				jest.advanceTimersByTime(3000);
-			});
+      await act(async () => {
+        fireEvent.press(screen.getByRole("button"));
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
 
-			await waitFor(() => {
-				expect(screen.getByText(/until next spin/)).toBeTruthy();
-			});
-		});
-	});
+      await waitFor(() => {
+        expect(screen.getByText(/until next spin/)).toBeTruthy();
+      });
+    });
+  });
 
-	describe('already spun today', () => {
-		it('shows todays prompt on load', async () => {
-			const today = new Date();
-			const prompt: SavedPrompt = {
-				text: 'favourite childhood sandwich',
-				createdAt: today.toISOString(),
-			};
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
+  describe("already spun today", () => {
+    it("shows todays prompt on load", async () => {
+      const today = new Date();
+      const prompt: SavedPrompt = {
+        text: "favourite childhood sandwich",
+        createdAt: today.toISOString(),
+      };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
 
-			await renderHome();
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('favourite')).toBeTruthy();
-				expect(screen.getByText('childhood')).toBeTruthy();
-				expect(screen.getByText('sandwich')).toBeTruthy();
-			});
-		});
+      await waitFor(() => {
+        expect(screen.getByText("favourite")).toBeTruthy();
+        expect(screen.getByText("childhood")).toBeTruthy();
+        expect(screen.getByText("sandwich")).toBeTruthy();
+      });
+    });
 
-		it('shows disabled button', async () => {
-			const today = new Date();
-			const prompt: SavedPrompt = {
-				text: 'first morning adventure',
-				createdAt: today.toISOString(),
-			};
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
+    it("shows disabled button", async () => {
+      const today = new Date();
+      const prompt: SavedPrompt = {
+        text: "first morning adventure",
+        createdAt: today.toISOString(),
+      };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
 
-			await renderHome();
+      await renderHome();
 
-			await waitFor(() => {
-				const button = screen.getByRole('button');
-				expect(button.props.accessibilityState?.disabled).toBe(true);
-			});
-		});
+      await waitFor(() => {
+        const button = screen.getByRole("button");
+        expect(button.props.accessibilityState?.disabled).toBe(true);
+      });
+    });
 
-		it('shows countdown timer', async () => {
-			const today = new Date();
-			const prompt: SavedPrompt = {
-				text: 'last summer meal',
-				createdAt: today.toISOString(),
-			};
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
+    it("shows countdown timer", async () => {
+      const today = new Date();
+      const prompt: SavedPrompt = {
+        text: "last summer meal",
+        createdAt: today.toISOString(),
+      };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
 
-			await renderHome();
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText(/until next spin/)).toBeTruthy();
-			});
-		});
-	});
+      await waitFor(() => {
+        expect(screen.getByText(/until next spin/)).toBeTruthy();
+      });
+    });
+  });
 
-	describe('corrupted prompt recovery', () => {
-		it('allows re-spin when stored prompt has empty words', async () => {
-			const today = new Date();
-			await AsyncStorage.setItem(
-				STORAGE_KEY,
-				JSON.stringify([{ text: '  ', createdAt: today.toISOString() }])
-			);
+  describe("corrupted prompt recovery", () => {
+    it("allows re-spin when stored prompt has empty words", async () => {
+      const today = new Date();
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify([{ text: "  ", createdAt: today.toISOString() }]),
+      );
 
-			await renderHome();
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
+      });
 
-			const button = screen.getByRole('button');
-			expect(button).toBeEnabled();
+      const button = screen.getByRole("button");
+      expect(button).toBeEnabled();
 
-			await act(async () => {
-				fireEvent.press(button);
-			});
-			await act(async () => {
-				jest.advanceTimersByTime(3000);
-			});
+      await act(async () => {
+        fireEvent.press(button);
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
 
-			await waitFor(() => {
-				expect(screen.getByText(/until next spin/)).toBeTruthy();
-			});
-		});
-	});
+      await waitFor(() => {
+        expect(screen.getByText(/until next spin/)).toBeTruthy();
+      });
+    });
+  });
 
-	describe('rapid tap prevention', () => {
-		it('prevents multiple spins', async () => {
-			await renderHome();
+  describe("rapid tap prevention", () => {
+    it("prevents multiple spins", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('SPIN')).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("SPIN")).toBeTruthy();
+      });
 
-			const button = screen.getByRole('button');
+      const button = screen.getByRole("button");
 
-			// First spin
-			await act(async () => {
-				fireEvent.press(button);
-			});
-			await act(async () => {
-				jest.advanceTimersByTime(3000);
-			});
+      // First spin
+      await act(async () => {
+        fireEvent.press(button);
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
 
-			// Button should now be disabled after spin completes
-			await waitFor(() => {
-				const btn = screen.getByRole('button');
-				expect(btn.props.accessibilityState?.disabled).toBe(true);
-			});
+      // Button should now be disabled after spin completes
+      await waitFor(() => {
+        const btn = screen.getByRole("button");
+        expect(btn.props.accessibilityState?.disabled).toBe(true);
+      });
 
-			// Attempting more presses should not add more prompts
-			await act(async () => {
-				fireEvent.press(button);
-				fireEvent.press(button);
-				jest.advanceTimersByTime(1000);
-			});
+      // Attempting more presses should not add more prompts
+      await act(async () => {
+        fireEvent.press(button);
+        fireEvent.press(button);
+        jest.advanceTimersByTime(1000);
+      });
 
-			// Flush microtasks and advance timers for async storage
-			act(() => {
-				jest.advanceTimersByTime(10);
-			});
+      // Flush microtasks and advance timers for async storage
+      act(() => {
+        jest.advanceTimersByTime(10);
+      });
 
-			// Should only have one prompt saved
-			const stored = await AsyncStorage.getItem(STORAGE_KEY);
-			const history = JSON.parse(stored!);
-			expect(history).toHaveLength(1);
-		});
-	});
+      // Should only have one prompt saved
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const history = JSON.parse(stored!);
+      expect(history).toHaveLength(1);
+    });
+  });
 
-	describe('navigation', () => {
-		it('hides History link when no prompts exist', async () => {
-			await renderHome();
+  describe("navigation", () => {
+    it("hides History link when no prompts exist", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('JOURNAL JACKPOT')).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("JOURNAL JACKPOT")).toBeTruthy();
+      });
 
-			expect(screen.queryByText('History')).toBeNull();
-		});
+      expect(screen.queryByText("History")).toBeNull();
+    });
 
-		it('hides History link after first spin (only 1 prompt)', async () => {
-			await renderHome();
+    it("hides History link after first spin (only 1 prompt)", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('SPIN')).toBeTruthy();
-			});
+      await waitFor(() => {
+        expect(screen.getByText("SPIN")).toBeTruthy();
+      });
 
-			expect(screen.queryByText('History')).toBeNull();
+      expect(screen.queryByText("History")).toBeNull();
 
-			await act(async () => {
-				fireEvent.press(screen.getByRole('button'));
-			});
-			await act(async () => {
-				jest.advanceTimersByTime(3000);
-			});
+      await act(async () => {
+        fireEvent.press(screen.getByRole("button"));
+      });
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
 
-			// Still no history link — need 2+ prompts
-			expect(screen.queryByText('History')).toBeNull();
-		});
-	});
+      // Still no history link — need 2+ prompts
+      expect(screen.queryByText("History")).toBeNull();
+    });
+  });
 
-	describe('reset', () => {
-		it('shows reset button on home screen', async () => {
-			await renderHome();
+  describe("reset", () => {
+    it("shows reset button on home screen", async () => {
+      await renderHome();
 
-			await waitFor(() => {
-				expect(screen.getByText('Reset')).toBeTruthy();
-			});
-		});
+      await waitFor(() => {
+        expect(screen.getByText("Reset")).toBeTruthy();
+      });
+    });
 
-		it('clears data and refreshes UI on reset', async () => {
-			const prompts: SavedPrompt[] = [
-				{ text: 'older prompt too', createdAt: '2024-01-14T10:00:00.000Z' },
-				{ text: 'test prompt here', createdAt: '2024-01-15T10:00:00.000Z' },
-			];
-			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
+    it("clears data and refreshes UI on reset", async () => {
+      const prompts: SavedPrompt[] = [
+        { text: "older prompt too", createdAt: "2024-01-14T10:00:00.000Z" },
+        { text: "test prompt here", createdAt: "2024-01-15T10:00:00.000Z" },
+      ];
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
 
-			// Auto-confirm the alert
-			jest
-				.spyOn(Alert, 'alert')
-				.mockImplementation((_title, _message, buttons) => {
-					const destructive = buttons?.find((b) => b.style === 'destructive');
-					destructive?.onPress?.();
-				});
+      // Auto-confirm the alert
+      jest
+        .spyOn(Alert, "alert")
+        .mockImplementation((_title, _message, buttons) => {
+          const destructive = buttons?.find((b) => b.style === "destructive");
+          destructive?.onPress?.();
+        });
 
-			await renderHome();
+      await renderHome();
 
-			// History link visible before reset
-			await waitFor(() => {
-				expect(screen.getByText('History')).toBeTruthy();
-			});
+      // History link visible before reset
+      await waitFor(() => {
+        expect(screen.getByText("History")).toBeTruthy();
+      });
 
-			await act(async () => {
-				fireEvent.press(screen.getByText('Reset'));
-				// Flush async operations (clearAllData, state updates)
-				await Promise.resolve();
-			});
+      await act(async () => {
+        fireEvent.press(screen.getByText("Reset"));
+        // Flush async operations (clearAllData, state updates)
+        await Promise.resolve();
+      });
 
-			// After reset, History link should disappear
-			await waitFor(() => {
-				expect(screen.queryByText('History')).toBeNull();
-			});
+      // After reset, History link should disappear
+      await waitFor(() => {
+        expect(screen.queryByText("History")).toBeNull();
+      });
 
-			// Storage should be empty
-			const stored = await AsyncStorage.getItem(STORAGE_KEY);
-			expect(stored).toBeNull();
-		});
-	});
+      // Storage should be empty
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      expect(stored).toBeNull();
+    });
+  });
 });

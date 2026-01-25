@@ -17,7 +17,7 @@ function syncResolve<T>(value: T): Promise<T> {
       onFinally?.();
       return syncResolve(value);
     },
-    [Symbol.toStringTag]: 'Promise',
+    [Symbol.toStringTag]: "Promise",
   } as Promise<T>;
 }
 
@@ -30,11 +30,11 @@ export default {
     return syncResolve(storage[key] ?? null);
   },
   removeItem: (key: string) => {
-    delete storage[key];
+    Reflect.deleteProperty(storage, key);
     return syncResolve(undefined);
   },
   clear: () => {
-    Object.keys(storage).forEach((key) => delete storage[key]);
+    Object.keys(storage).forEach((key) => Reflect.deleteProperty(storage, key));
     return syncResolve(undefined);
   },
   getAllKeys: () => {
@@ -50,7 +50,7 @@ export default {
     return syncResolve(undefined);
   },
   multiRemove: (keys: string[]) => {
-    keys.forEach((key) => delete storage[key]);
+    keys.forEach((key) => Reflect.deleteProperty(storage, key));
     return syncResolve(undefined);
   },
   mergeItem: (key: string, value: string) => {

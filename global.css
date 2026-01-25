@@ -2,9 +2,9 @@
 @import "nativewind/theme";
 
 @theme {
-  --font-heading: 'SpaceGrotesk_600SemiBold';
-  --font-body: 'DMSans_400Regular';
-  --font-mono: 'IBMPlexMono_400Regular';
+  --font-heading: "SpaceGrotesk_600SemiBold";
+  --font-body: "DMSans_400Regular";
+  --font-mono: "IBMPlexMono_400Regular";
 }
 
 @theme inline {

@@ -6,7 +6,6 @@ node_modules/
 # Expo
 .expo/
 dist/
-web-build/
 expo-env.d.ts
 
 # Native
@@ -31,6 +30,7 @@ yarn-error.*
 *.pem
 
 # local config
+.env
 .env*.local
 *.local.json
 *.local.md
@@ -40,7 +40,6 @@ yarn-error.*
 
 # generated native folders
 /ios
-/android
 
 # testing
 coverage/
