@@ -63,7 +63,7 @@ describe('Home', () => {
 			});
 
 			await waitFor(() => {
-				expect(screen.getByText("Today's prompt")).toBeTruthy();
+				expect(screen.getByText(/until next spin/)).toBeTruthy();
 			});
 		});
 
@@ -126,7 +126,9 @@ describe('Home', () => {
 			renderHome();
 
 			await waitFor(() => {
-				expect(screen.getByText(/favourite childhood sandwich/)).toBeTruthy();
+				expect(screen.getByText('favourite')).toBeTruthy();
+				expect(screen.getByText('childhood')).toBeTruthy();
+				expect(screen.getByText('sandwich')).toBeTruthy();
 			});
 		});
 
@@ -219,7 +221,7 @@ describe('Home', () => {
 			renderHome();
 
 			await waitFor(() => {
-				expect(screen.getByText('Journal Jackpot')).toBeTruthy();
+				expect(screen.getByText('JOURNAL JACKPOT')).toBeTruthy();
 			});
 
 			expect(screen.queryByText('History')).toBeNull();

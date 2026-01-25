@@ -87,22 +87,30 @@ function AppShell({ onReset }: { onReset: () => void }) {
 
 	return (
 		<SafeAreaView style={{ flex: 1 }} className="bg-surface dark:bg-surface-dark">
-			<Header>
-				<Header.Left>
-					{__DEV__ && isHome && <DevResetButton onPress={onReset} />}
-					{!isHome && (
+			{!isHome && (
+				<Header>
+					<Header.Left>
 						<Link href="back" label="Back" icon="chevron-back" />
-					)}
-				</Header.Left>
-				<Header.Center>
-					<Text variant="page-title">{pageTitle}</Text>
-				</Header.Center>
-				<Header.Right>
-					{isHome && hasHistory && (
+					</Header.Left>
+					<Header.Center>
+						<Text variant="page-title">{pageTitle}</Text>
+					</Header.Center>
+					<Header.Right />
+				</Header>
+			)}
+			{isHome && __DEV__ && (
+				<View className="flex-row justify-between px-4 pt-1">
+					<DevResetButton onPress={onReset} />
+					{hasHistory && (
 						<Link href="/history" label="History" icon="time-outline" />
 					)}
-				</Header.Right>
-			</Header>
+				</View>
+			)}
+			{isHome && !__DEV__ && hasHistory && (
+				<View className="flex-row justify-end px-4 pt-1">
+					<Link href="/history" label="History" icon="time-outline" />
+				</View>
+			)}
 			<View className="flex-1 w-full">
 				<Slot />
 			</View>

@@ -21,6 +21,11 @@ jest.mock('expo-splash-screen', () => ({
 	hideAsync: jest.fn(),
 }));
 
+// Mock expo-linear-gradient
+jest.mock('expo-linear-gradient', () => ({
+	LinearGradient: 'LinearGradient',
+}));
+
 // react-native-reanimated is auto-mocked via __mocks__/react-native-reanimated.js
 // react-native-reanimated/mock is mapped via moduleNameMapper in jest.config.js
 // (needed because expo-router/testing-library overrides the reanimated mock)

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Reel } from './reel';
+import { ReelWindow, ReelSeparator } from './reel-window';
 import type { Reel as ReelType } from '../../types';
 
 interface SlotMachineProps {
@@ -36,17 +37,19 @@ export function SlotMachine({
 	}, [reels.length, onAllReelsStopped]);
 
 	return (
-		<View className="flex-row gap-2">
+		<ReelWindow>
 			{reels.map((reel, index) => (
-				<Reel
-					key={reel.id}
-					reel={reel}
-					spinning={visualSpinning}
-					stopDelay={STOP_DELAYS[index]}
-					selectedWord={displayWords[index]}
-					onStopped={handleReelStopped}
-				/>
+				<View key={reel.id} style={{ flex: 1, flexDirection: 'row' }}>
+					{index > 0 && <ReelSeparator />}
+					<Reel
+						reel={reel}
+						spinning={visualSpinning}
+						stopDelay={STOP_DELAYS[index]}
+						selectedWord={displayWords[index]}
+						onStopped={handleReelStopped}
+					/>
+				</View>
 			))}
-		</View>
+		</ReelWindow>
 	);
 }

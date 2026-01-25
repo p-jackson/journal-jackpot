@@ -22,7 +22,7 @@ function HeaderCenter({ children }: { children: React.ReactNode }) {
 	);
 }
 
-function HeaderRight({ children }: { children: React.ReactNode }) {
+function HeaderRight({ children }: { children?: React.ReactNode }) {
 	return <View className="flex flex-row flex-1 justify-end">{children}</View>;
 }
 

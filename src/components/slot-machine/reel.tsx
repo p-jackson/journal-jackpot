@@ -28,7 +28,7 @@ export function Reel({
   onStopped,
 }: ReelProps) {
   const [displayWord, setDisplayWord] = useState(
-    selectedWord || '—'
+    selectedWord || '\u2014'
   );
   const [cycleIndex, setCycleIndex] = useState(0);
   const opacity = useSharedValue(1);
@@ -92,7 +92,7 @@ export function Reel({
     } else if (selectedWord) {
       setDisplayWord(selectedWord);
     } else {
-      setDisplayWord('—');
+      setDisplayWord('\u2014');
     }
   }, [spinning, stopDelay, selectedWord, reel.words.length, opacity, translateY, handleStopped]);
 
@@ -107,25 +107,37 @@ export function Reel({
     transform: [{ translateY: translateY.value }],
   }));
 
+  const hasResult = selectedWord && !spinning;
+
   return (
-    <View className="items-center justify-center w-28 h-20">
-      <View
-        className={`w-full h-full rounded-xl border-2 items-center justify-center px-2 ${
-          selectedWord && !spinning
-            ? 'border-amber-400 bg-amber-50'
-            : 'border-border bg-white'
-        }`}
-      >
-        <Animated.View style={animatedStyle}>
-          <Text
-            className="font-heading text-base text-center text-text"
-            numberOfLines={2}
-            adjustsFontSizeToFit
-          >
-            {displayWord}
-          </Text>
-        </Animated.View>
-      </View>
+    <View
+      style={[
+        {
+          flex: 1,
+          height: 80,
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 6,
+        },
+        hasResult && {
+          backgroundColor: 'rgba(251,191,36,0.12)',
+        },
+      ]}
+    >
+      <Animated.View style={animatedStyle}>
+        <Text
+          style={{
+            fontFamily: 'SpaceGrotesk_600SemiBold',
+            fontSize: 15,
+            textAlign: 'center',
+            color: hasResult ? '#92400e' : '#18181b',
+          }}
+          numberOfLines={2}
+          adjustsFontSizeToFit
+        >
+          {displayWord}
+        </Text>
+      </Animated.View>
     </View>
   );
 }

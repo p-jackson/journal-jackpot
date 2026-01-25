@@ -63,7 +63,9 @@ describe('History', () => {
 			{ initialUrl: '/' }
 		);
 
-		expect(screen.getByText('Journal Jackpot')).toBeTruthy();
+		await waitFor(() => {
+			expect(screen.getByText('JOURNAL JACKPOT')).toBeTruthy();
+		});
 
 		await waitFor(() => {
 			expect(screen.getByText('History')).toBeTruthy();
@@ -80,7 +82,7 @@ describe('History', () => {
 		fireEvent.press(screen.getByText('Back'));
 
 		await waitFor(() => {
-			expect(screen.getByText('Journal Jackpot')).toBeTruthy();
+			expect(screen.getByText('JOURNAL JACKPOT')).toBeTruthy();
 		});
 	});
 });

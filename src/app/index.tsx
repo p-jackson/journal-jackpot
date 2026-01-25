@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { Text } from '../components/ui/text';
+import { View, ActivityIndicator, Text } from 'react-native';
 import { useSlotMachine } from '../hooks/use-slot-machine';
 import { SlotMachine } from '../components/slot-machine/slot-machine';
 import { SpinButton } from '../components/slot-machine/spin-button';
 import { Celebration } from '../components/slot-machine/celebration';
 import { CountdownTimer } from '../components/slot-machine/countdown-timer';
+import { MachineBody } from '../components/slot-machine/machine-body';
+import { MachineTopBanner } from '../components/slot-machine/machine-top-banner';
+import { MachineLights } from '../components/slot-machine/machine-lights';
 import { useHistoryContext } from '../contexts/history-context';
 
 export default function Home() {
@@ -53,51 +55,50 @@ export default function Home() {
 	const displayWords = todaysPrompt?.words || reelWords;
 
 	return (
-		<View className="flex-1 items-center justify-center px-4 relative">
+		<View className="flex-1 items-center justify-center px-6 relative">
 			<Celebration
 				visible={showCelebration}
 				onComplete={handleCelebrationComplete}
 			/>
 
-			<View className="mb-8">
-				<SlotMachine
-					reels={reels}
-					spinning={spinning}
-					displayWords={displayWords}
-					onAllReelsStopped={handleAllReelsStopped}
-				/>
+			<View style={{ position: 'relative', alignSelf: 'stretch' }}>
+				<MachineBody>
+					<MachineTopBanner />
+
+					<View style={{ marginBottom: 16 }}>
+						<SlotMachine
+							reels={reels}
+							spinning={spinning}
+							displayWords={displayWords}
+							onAllReelsStopped={handleAllReelsStopped}
+						/>
+					</View>
+
+					{/* Bottom panel */}
+					<View style={{ alignItems: 'center', gap: 12 }}>
+						<SpinButton
+							onPress={handleSpin}
+							disabled={!canSpin}
+							spinning={spinning || !allReelsStopped}
+						/>
+
+					</View>
+				</MachineBody>
+
+				<MachineLights active />
 			</View>
 
-			{todaysPrompt && allReelsStopped && (
-				<View className="mb-8 px-4">
-					<Text variant="heading-lg" className="text-center">
-						“{todaysPrompt.words.join(' ')}”
-					</Text>
-					<Text variant="body-sm" className="text-center mt-2">
-						Today's prompt
-					</Text>
-				</View>
-			)}
-
-			{!todaysPrompt && allReelsStopped && (
-				<View className="mb-8">
-					<Text variant="muted" className="text-center">
+			<View style={{ marginTop: 16, alignItems: 'center' }}>
+				{!todaysPrompt && allReelsStopped ? (
+					<Text style={{ color: '#71717a', fontSize: 14, textAlign: 'center' }}>
 						Tap SPIN to get today's prompt
 					</Text>
-				</View>
-			)}
-
-			<SpinButton
-				onPress={handleSpin}
-				disabled={!canSpin}
-				spinning={spinning || !allReelsStopped}
-			/>
-
-			{nextSpinAt && allReelsStopped && (
-				<View className="mt-6">
+				) : nextSpinAt && allReelsStopped ? (
 					<CountdownTimer targetDate={nextSpinAt} />
-				</View>
-			)}
+				) : (
+					<Text style={{ fontSize: 14 }}>{'\u00A0'}</Text>
+				)}
+			</View>
 		</View>
 	);
 }

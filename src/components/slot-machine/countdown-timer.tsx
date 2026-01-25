@@ -36,7 +36,7 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
   }, [targetDate]);
 
   return (
-    <Text className="text-text-muted text-sm text-center">
+    <Text style={{ color: '#71717a', fontSize: 13, textAlign: 'center' }}>
       {formatTimeLeft(timeLeft)} until next spin
     </Text>
   );
