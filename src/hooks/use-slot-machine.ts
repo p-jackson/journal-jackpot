@@ -1,10 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import {
-  savePrompt,
-  getTodaysPrompt,
-  canSpinToday,
-  setLastSpinDate,
-} from '../storage/prompt-storage';
+import { useState, useCallback, useMemo } from 'react';
+import { isSameDay } from 'date-fns';
+import { usePromptStorage } from '../contexts/prompt-storage-context';
 import { REELS } from '../data/reels';
 import type { Prompt, Reel } from '../types';
 
@@ -12,84 +8,82 @@ import type { Prompt, Reel } from '../types';
 const DEBUG_ALLOW_INFINITE_SPINS = __DEV__ && process.env.NODE_ENV !== 'test';
 
 interface UseSlotMachineReturn {
-  reels: Reel[];
-  loading: boolean;
-  spinning: boolean;
-  canSpin: boolean;
-  todaysPrompt: Prompt | null;
-  nextSpinAt: string | null;
-  spin: () => Promise<void>;
+	reels: Reel[];
+	loading: boolean;
+	spinning: boolean;
+	canSpin: boolean;
+	todaysPrompt: Prompt | null;
+	nextSpinAt: string | null;
+	spin: () => void;
 }
 
 function getRandomWord(reel: Reel): string {
-  const idx = Math.floor(Math.random() * reel.words.length);
-  return reel.words[idx];
+	const idx = Math.floor(Math.random() * reel.words.length);
+	return reel.words[idx];
 }
 
 function getNextMidnight(): Date {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  return tomorrow;
+	const tomorrow = new Date();
+	tomorrow.setDate(tomorrow.getDate() + 1);
+	tomorrow.setHours(0, 0, 0, 0);
+	return tomorrow;
 }
 
 export function useSlotMachine(): UseSlotMachineReturn {
-  const [loading, setLoading] = useState(true);
-  const [spinning, setSpinning] = useState(false);
-  const [canSpin, setCanSpin] = useState(false);
-  const [todaysPrompt, setTodaysPrompt] = useState<Prompt | null>(null);
+	const [history, savePrompt] = usePromptStorage();
+	const [spinning, setSpinning] = useState(false);
 
-  useEffect(() => {
-    async function loadState() {
-      const [canSpinResult, existingPrompt] = await Promise.all([
-        canSpinToday(),
-        getTodaysPrompt(),
-      ]);
+	const todaysPrompt = useMemo(() => {
+		const latest = history[history.length - 1];
+		if (!latest || !isSameDay(new Date(latest.createdAt), new Date()))
+			return null;
 
-      setCanSpin(existingPrompt ? canSpinResult : true);
-      setTodaysPrompt(existingPrompt);
-      setLoading(false);
-    }
+		const parts = latest.text.split(' ');
+		if (parts.length !== 3) {
+			console.warn(
+				`Prompt has ${parts.length} words, expected 3: "${latest.text}"`
+			);
+		}
+		const words: [string, string, string] = [
+			parts[0] ?? '',
+			parts[1] ?? '',
+			parts[2] ?? '',
+		];
+		// Allow respin if data is corrupted
+		if (words.some((w) => !w)) return null;
+		return { words, createdAt: latest.createdAt };
+	}, [history]);
 
-    loadState();
-  }, []);
+	const canSpin = !todaysPrompt || DEBUG_ALLOW_INFINITE_SPINS;
 
-  const spin = useCallback(async () => {
-    if ((!canSpin && !DEBUG_ALLOW_INFINITE_SPINS) || spinning) return;
+	const spin = useCallback(() => {
+		if ((!canSpin && !DEBUG_ALLOW_INFINITE_SPINS) || spinning) return;
 
-    setSpinning(true);
+		setSpinning(true);
 
-    try {
-      const words: [string, string, string] = [
-        getRandomWord(REELS[0]),
-        getRandomWord(REELS[1]),
-        getRandomWord(REELS[2]),
-      ];
+		const words: [string, string, string] = [
+			getRandomWord(REELS[0]),
+			getRandomWord(REELS[1]),
+			getRandomWord(REELS[2]),
+		];
 
-      const prompt: Prompt = {
-        words,
-        createdAt: new Date().toISOString(),
-      };
+		const createdAt = new Date().toISOString();
+		savePrompt({ text: words.join(' '), createdAt });
 
-      await savePrompt({ text: words.join(' '), createdAt: prompt.createdAt });
-      await setLastSpinDate(new Date());
+		// Delay setSpinning(false) so React renders with spinning=true first
+		// This allows SlotMachine to latch onto the spinning state
+		queueMicrotask(() => setSpinning(false));
+	}, [canSpin, spinning, savePrompt]);
 
-      setTodaysPrompt(prompt);
-      setCanSpin(false);
-    } finally {
-      setSpinning(false);
-    }
-  }, [canSpin, spinning]);
+	const nextSpinAt = todaysPrompt ? getNextMidnight().toISOString() : null;
 
-  const nextSpinAt = canSpin ? null : getNextMidnight().toISOString();
-
-  return {
-    reels: REELS,
-    loading,
-    spinning,
-    canSpin: canSpin || DEBUG_ALLOW_INFINITE_SPINS,
-    todaysPrompt,
-    nextSpinAt,
-    spin,
-  };
+	return {
+		reels: REELS,
+		loading: false,
+		spinning,
+		canSpin,
+		todaysPrompt,
+		nextSpinAt,
+		spin,
+	};
 }

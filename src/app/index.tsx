@@ -9,7 +9,6 @@ import { CountdownTimer } from '../components/slot-machine/countdown-timer';
 import { MachineBody } from '../components/slot-machine/machine-body';
 import { MachineTopBanner } from '../components/slot-machine/machine-top-banner';
 import { MachineLights } from '../components/slot-machine/machine-lights';
-import { useHistoryContext } from '../contexts/history-context';
 
 export default function Home() {
 	const {
@@ -21,18 +20,21 @@ export default function Home() {
 		nextSpinAt,
 		spin,
 	} = useSlotMachine();
-	const { refreshHistory } = useHistoryContext();
 
 	const [showCelebration, setShowCelebration] = useState(false);
-	const [reelWords, setReelWords] = useState<(string | null)[]>([null, null, null]);
+	const [reelWords, setReelWords] = useState<(string | null)[]>([
+		null,
+		null,
+		null,
+	]);
 	const [allReelsStopped, setAllReelsStopped] = useState(true);
 
-	const handleSpin = useCallback(async () => {
+	const handleSpin = useCallback(() => {
 		if (!canSpin || spinning) return;
 
 		setReelWords([null, null, null]);
 		setAllReelsStopped(false);
-		await spin();
+		spin();
 	}, [canSpin, spinning, spin]);
 
 	const handleAllReelsStopped = useCallback(() => {
@@ -42,8 +44,7 @@ export default function Home() {
 
 	const handleCelebrationComplete = useCallback(() => {
 		setShowCelebration(false);
-		refreshHistory();
-	}, [refreshHistory]);
+	}, []);
 
 	if (loading) {
 		return (
@@ -82,7 +83,6 @@ export default function Home() {
 							disabled={!canSpin}
 							spinning={spinning || !allReelsStopped}
 						/>
-
 					</View>
 				</MachineBody>
 

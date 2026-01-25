@@ -1,17 +1,9 @@
-import { ActivityIndicator, View } from 'react-native';
 import { PromptHistory } from '../components/prompt-history/PromptHistory';
-import { usePromptHistory } from '../hooks/use-prompt-history';
+import { usePromptStorage } from '../contexts/prompt-storage-context';
 
 export default function History() {
-	const { prompts, loading, journeyStartDate } = usePromptHistory();
+	const [history] = usePromptStorage();
+	const prompts = history.filter((p) => p.text.trim()).reverse();
 
-	if (loading) {
-		return (
-			<View className="flex-1 items-center justify-center">
-				<ActivityIndicator size="large" testID="activity-indicator" />
-			</View>
-		);
-	}
-
-	return <PromptHistory prompts={prompts} journeyStartDate={journeyStartDate} />;
+	return <PromptHistory prompts={prompts} />;
 }

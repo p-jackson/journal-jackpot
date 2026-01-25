@@ -1,19 +1,29 @@
 jest.unmock('expo-router');
 
 import { Alert } from 'react-native';
-import { renderRouter, screen, fireEvent, waitFor, act } from 'expo-router/testing-library';
+import {
+	renderRouter,
+	screen,
+	fireEvent,
+	waitFor,
+	act,
+} from 'expo-router/testing-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './index';
 import History from './history';
 import RootLayout from './_layout';
-import { STORAGE_KEYS } from '../storage/prompt-storage';
 import type { SavedPrompt } from '../types';
 
-function renderHome() {
-	return renderRouter(
+const STORAGE_KEY = 'journal-jackpot:prompt-history';
+
+async function renderHome() {
+	const result = renderRouter(
 		{ index: Home, history: History, _layout: RootLayout },
 		{ initialUrl: '/' }
 	);
+	// Flush navigation effects to avoid act() warnings
+	await act(async () => {});
+	return result;
 }
 
 describe('Home', () => {
@@ -29,7 +39,7 @@ describe('Home', () => {
 
 	describe('first spin of the day', () => {
 		it('shows enabled spin button for new user', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.queryByTestId('activity-indicator')).toBeNull();
@@ -41,7 +51,7 @@ describe('Home', () => {
 		});
 
 		it('shows placeholder text for new user', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
@@ -49,7 +59,7 @@ describe('Home', () => {
 		});
 
 		it('generates and displays prompt after spin', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -68,7 +78,7 @@ describe('Home', () => {
 		});
 
 		it('disables button after spin', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -88,7 +98,7 @@ describe('Home', () => {
 		});
 
 		it('shows countdown timer after spin', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -114,16 +124,9 @@ describe('Home', () => {
 				text: 'favourite childhood sandwich',
 				createdAt: today.toISOString(),
 			};
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.PROMPT_HISTORY,
-				JSON.stringify([prompt])
-			);
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.LAST_SPIN_DATE,
-				today.toISOString()
-			);
+			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
 
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('favourite')).toBeTruthy();
@@ -138,16 +141,9 @@ describe('Home', () => {
 				text: 'first morning adventure',
 				createdAt: today.toISOString(),
 			};
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.PROMPT_HISTORY,
-				JSON.stringify([prompt])
-			);
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.LAST_SPIN_DATE,
-				today.toISOString()
-			);
+			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
 
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				const button = screen.getByRole('button');
@@ -161,16 +157,9 @@ describe('Home', () => {
 				text: 'last summer meal',
 				createdAt: today.toISOString(),
 			};
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.PROMPT_HISTORY,
-				JSON.stringify([prompt])
-			);
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.LAST_SPIN_DATE,
-				today.toISOString()
-			);
+			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
 
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText(/until next spin/)).toBeTruthy();
@@ -182,15 +171,11 @@ describe('Home', () => {
 		it('allows re-spin when stored prompt has empty words', async () => {
 			const today = new Date();
 			await AsyncStorage.setItem(
-				STORAGE_KEYS.PROMPT_HISTORY,
+				STORAGE_KEY,
 				JSON.stringify([{ text: '  ', createdAt: today.toISOString() }])
 			);
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.LAST_SPIN_DATE,
-				today.toISOString()
-			);
 
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText("Tap SPIN to get today's prompt")).toBeTruthy();
@@ -214,7 +199,7 @@ describe('Home', () => {
 
 	describe('rapid tap prevention', () => {
 		it('prevents multiple spins', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -243,8 +228,13 @@ describe('Home', () => {
 				jest.advanceTimersByTime(1000);
 			});
 
+			// Flush microtasks and advance timers for async storage
+			act(() => {
+				jest.advanceTimersByTime(10);
+			});
+
 			// Should only have one prompt saved
-			const stored = await AsyncStorage.getItem(STORAGE_KEYS.PROMPT_HISTORY);
+			const stored = await AsyncStorage.getItem(STORAGE_KEY);
 			const history = JSON.parse(stored!);
 			expect(history).toHaveLength(1);
 		});
@@ -252,7 +242,7 @@ describe('Home', () => {
 
 	describe('navigation', () => {
 		it('hides History link when no prompts exist', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('JOURNAL JACKPOT')).toBeTruthy();
@@ -262,7 +252,7 @@ describe('Home', () => {
 		});
 
 		it('hides History link after first spin (only 1 prompt)', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('SPIN')).toBeTruthy();
@@ -284,7 +274,7 @@ describe('Home', () => {
 
 	describe('reset', () => {
 		it('shows reset button on home screen', async () => {
-			renderHome();
+			await renderHome();
 
 			await waitFor(() => {
 				expect(screen.getByText('Reset')).toBeTruthy();
@@ -296,25 +286,28 @@ describe('Home', () => {
 				{ text: 'older prompt too', createdAt: '2024-01-14T10:00:00.000Z' },
 				{ text: 'test prompt here', createdAt: '2024-01-15T10:00:00.000Z' },
 			];
-			await AsyncStorage.setItem(
-				STORAGE_KEYS.PROMPT_HISTORY,
-				JSON.stringify(prompts)
-			);
+			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
 
 			// Auto-confirm the alert
-			jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
-				const destructive = buttons?.find((b) => b.style === 'destructive');
-				destructive?.onPress?.();
-			});
+			jest
+				.spyOn(Alert, 'alert')
+				.mockImplementation((_title, _message, buttons) => {
+					const destructive = buttons?.find((b) => b.style === 'destructive');
+					destructive?.onPress?.();
+				});
 
-			renderHome();
+			await renderHome();
 
 			// History link visible before reset
 			await waitFor(() => {
 				expect(screen.getByText('History')).toBeTruthy();
 			});
 
-			fireEvent.press(screen.getByText('Reset'));
+			await act(async () => {
+				fireEvent.press(screen.getByText('Reset'));
+				// Flush async operations (clearAllData, state updates)
+				await Promise.resolve();
+			});
 
 			// After reset, History link should disappear
 			await waitFor(() => {
@@ -322,7 +315,7 @@ describe('Home', () => {
 			});
 
 			// Storage should be empty
-			const stored = await AsyncStorage.getItem(STORAGE_KEYS.PROMPT_HISTORY);
+			const stored = await AsyncStorage.getItem(STORAGE_KEY);
 			expect(stored).toBeNull();
 		});
 	});

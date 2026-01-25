@@ -5,7 +5,7 @@ import type { SavedPrompt } from '../../types';
 describe('PromptHistory', () => {
 	describe('empty state', () => {
 		it('renders empty message when no prompts', () => {
-			render(<PromptHistory prompts={[]} journeyStartDate={null} />);
+			render(<PromptHistory prompts={[]} />);
 			expect(screen.getByText(/no prompts yet/i)).toBeTruthy();
 		});
 	});
@@ -18,24 +18,14 @@ describe('PromptHistory', () => {
 		];
 
 		it('skips latest prompt and renders past prompts', () => {
-			render(
-				<PromptHistory
-					prompts={mockPrompts}
-					journeyStartDate={mockPrompts[2].createdAt}
-				/>
-			);
+			render(<PromptHistory prompts={mockPrompts} />);
 			expect(screen.queryByText('a b c')).toBeNull();
 			expect(screen.getByText('d e f')).toBeTruthy();
 			expect(screen.getByText('g h i')).toBeTruthy();
 		});
 
 		it('uses space-separated words', () => {
-			render(
-				<PromptHistory
-					prompts={mockPrompts}
-					journeyStartDate={mockPrompts[2].createdAt}
-				/>
-			);
+			render(<PromptHistory prompts={mockPrompts} />);
 			expect(screen.queryByText(/·/)).toBeNull();
 			expect(screen.getByText('d e f')).toBeTruthy();
 		});
@@ -71,46 +61,26 @@ describe('PromptHistory', () => {
 
 		it('formats today as "Today"', () => {
 			const prompts = makePrompts(getDateString(0));
-			render(
-				<PromptHistory
-					prompts={prompts}
-					journeyStartDate={prompts[1].createdAt}
-				/>
-			);
+			render(<PromptHistory prompts={prompts} />);
 			expect(screen.getByText('Today')).toBeTruthy();
 		});
 
 		it('formats yesterday as "Yesterday"', () => {
 			const prompts = makePrompts(getDateString(1));
-			render(
-				<PromptHistory
-					prompts={prompts}
-					journeyStartDate={prompts[1].createdAt}
-				/>
-			);
+			render(<PromptHistory prompts={prompts} />);
 			expect(screen.getByText('Yesterday')).toBeTruthy();
 		});
 
 		it('formats 3 days ago as "3 days ago"', () => {
 			const prompts = makePrompts(getDateString(3));
-			render(
-				<PromptHistory
-					prompts={prompts}
-					journeyStartDate={prompts[1].createdAt}
-				/>
-			);
+			render(<PromptHistory prompts={prompts} />);
 			expect(screen.getByText('3 days ago')).toBeTruthy();
 		});
 
 		it('formats older dates as weekday + day', () => {
 			const createdAt = getDateString(9);
 			const prompts = makePrompts(createdAt);
-			render(
-				<PromptHistory
-					prompts={prompts}
-					journeyStartDate={prompts[1].createdAt}
-				/>
-			);
+			render(<PromptHistory prompts={prompts} />);
 			const date = new Date(createdAt);
 			const expected = `${date.toLocaleDateString('en-US', { weekday: 'short' })} ${date.getDate()}`;
 			expect(screen.getByText(expected)).toBeTruthy();

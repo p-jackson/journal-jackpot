@@ -7,8 +7,11 @@ import { useFonts } from 'expo-font';
 import { Header } from '../components/ui/header';
 import { Link } from '../components/ui/link';
 import { DevResetButton } from '../components/ui/dev-reset-button';
-import { HistoryProvider, useHistoryContext } from '../contexts/history-context';
-import { clearAllData } from '../storage/prompt-storage';
+import {
+	PromptStorageProvider,
+	usePromptStorage,
+} from '../contexts/prompt-storage-context';
+import { clearAllData, getPromptHistory } from '../storage/prompt-storage';
 import {
 	SpaceGrotesk_400Regular,
 	SpaceGrotesk_500Medium,
@@ -27,6 +30,7 @@ import {
 	IBMPlexMono_600SemiBold,
 } from '@expo-google-fonts/ibm-plex-mono';
 import * as SplashScreen from 'expo-splash-screen';
+import type { SavedPrompt } from '../types';
 import '../../global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -45,15 +49,21 @@ export default function RootLayout() {
 		IBMPlexMono_500Medium,
 		IBMPlexMono_600SemiBold,
 	});
+	const [history, setHistory] = useState<SavedPrompt[] | null>(null);
 	const [resetKey, setResetKey] = useState(0);
 
 	useEffect(() => {
-		if (fontsLoaded || fontError) {
+		getPromptHistory().then(setHistory);
+	}, [resetKey]);
+
+	useEffect(() => {
+		if ((fontsLoaded || fontError) && history !== null) {
 			SplashScreen.hideAsync();
 		}
-	}, [fontsLoaded, fontError]);
+	}, [fontsLoaded, fontError, history]);
 
-	if (!fontsLoaded && !fontError) {
+	// Wait for fonts AND history
+	if ((!fontsLoaded && !fontError) || history === null) {
 		return null;
 	}
 
@@ -65,6 +75,7 @@ export default function RootLayout() {
 				style: 'destructive',
 				onPress: async () => {
 					await clearAllData();
+					setHistory(null); // Clear state so we reload fresh
 					setResetKey((k) => k + 1);
 				},
 			},
@@ -72,50 +83,51 @@ export default function RootLayout() {
 	};
 
 	return (
-		<HistoryProvider key={resetKey}>
+		<PromptStorageProvider key={resetKey} initialHistory={history}>
 			<AppShell onReset={handleReset} />
-		</HistoryProvider>
+		</PromptStorageProvider>
 	);
 }
 
 function AppShell({ onReset }: { onReset: () => void }) {
 	const pathname = usePathname();
-	const { hasHistory } = useHistoryContext();
+	const [history] = usePromptStorage();
+	const hasHistory = history.length >= 2;
 
 	const isHome = pathname === '/';
 	const pageTitle = isHome ? 'Journal Jackpot' : 'History';
 
 	return (
 		<View className="flex-1 bg-surface dark:bg-surface-dark">
-		<SafeAreaView style={{ flex: 1 }}>
-			{!isHome && (
-				<Header>
-					<Header.Left>
-						<Link href="back" label="Back" icon="chevron-back" />
-					</Header.Left>
-					<Header.Center>
-						<Text variant="page-title">{pageTitle}</Text>
-					</Header.Center>
-					<Header.Right />
-				</Header>
-			)}
-			{isHome && __DEV__ && (
-				<View className="flex-row justify-between px-4 pt-1">
-					<DevResetButton onPress={onReset} />
-					{hasHistory && (
+			<SafeAreaView style={{ flex: 1 }}>
+				{!isHome && (
+					<Header>
+						<Header.Left>
+							<Link href="back" label="Back" icon="chevron-back" />
+						</Header.Left>
+						<Header.Center>
+							<Text variant="page-title">{pageTitle}</Text>
+						</Header.Center>
+						<Header.Right />
+					</Header>
+				)}
+				{isHome && __DEV__ && (
+					<View className="flex-row justify-between px-4 pt-1">
+						<DevResetButton onPress={onReset} />
+						{hasHistory && (
+							<Link href="/history" label="History" icon="time-outline" />
+						)}
+					</View>
+				)}
+				{isHome && !__DEV__ && hasHistory && (
+					<View className="flex-row justify-end px-4 pt-1">
 						<Link href="/history" label="History" icon="time-outline" />
-					)}
+					</View>
+				)}
+				<View className="flex-1 w-full">
+					<Slot />
 				</View>
-			)}
-			{isHome && !__DEV__ && hasHistory && (
-				<View className="flex-row justify-end px-4 pt-1">
-					<Link href="/history" label="History" icon="time-outline" />
-				</View>
-			)}
-			<View className="flex-1 w-full">
-				<Slot />
-			</View>
-		</SafeAreaView>
+			</SafeAreaView>
 		</View>
 	);
 }

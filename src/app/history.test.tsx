@@ -1,12 +1,18 @@
 jest.unmock('expo-router');
 
-import { renderRouter, screen, fireEvent, waitFor } from 'expo-router/testing-library';
+import {
+	renderRouter,
+	screen,
+	fireEvent,
+	waitFor,
+} from 'expo-router/testing-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './index';
 import History from './history';
 import RootLayout from './_layout';
-import { STORAGE_KEYS } from '../storage/prompt-storage';
 import type { SavedPrompt } from '../types';
+
+const STORAGE_KEY = 'journal-jackpot:prompt-history';
 
 function renderHistory() {
 	return renderRouter(
@@ -20,19 +26,14 @@ describe('History', () => {
 		await AsyncStorage.clear();
 	});
 
-	it('shows loading then content', async () => {
+	it('shows content after loading', async () => {
 		const prompts: SavedPrompt[] = [
 			{ text: 'd e f', createdAt: '2024-01-14T10:00:00.000Z' },
 			{ text: 'a b c', createdAt: '2024-01-15T10:00:00.000Z' },
 		];
-		await AsyncStorage.setItem(
-			STORAGE_KEYS.PROMPT_HISTORY,
-			JSON.stringify(prompts)
-		);
+		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
 
 		renderHistory();
-
-		expect(screen.getByTestId('activity-indicator')).toBeTruthy();
 
 		// Latest prompt (a b c) skipped; older one shown
 		await waitFor(() => {
@@ -53,10 +54,7 @@ describe('History', () => {
 			{ text: 'older prompt too', createdAt: '2024-01-14T10:00:00.000Z' },
 			{ text: 'test prompt here', createdAt: '2024-01-15T10:00:00.000Z' },
 		];
-		await AsyncStorage.setItem(
-			STORAGE_KEYS.PROMPT_HISTORY,
-			JSON.stringify(prompts)
-		);
+		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
 
 		renderRouter(
 			{ index: Home, history: History, _layout: RootLayout },
