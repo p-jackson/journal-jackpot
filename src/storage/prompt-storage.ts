@@ -22,7 +22,7 @@ export async function getPromptHistory(): Promise<SavedPrompt[]> {
 	return JSON.parse(stored);
 }
 
-export async function getTodaysPrompt(): Promise<Prompt | null> {
+export async function getTodaysPrompt() {
 	const history = await getPromptHistory();
 	if (history.length === 0) return null;
 
@@ -61,4 +61,27 @@ export async function canSpinToday() {
 
 	const today = new Date();
 	return !isSameDay(lastSpin, today);
+}
+
+export async function getPromptsForHistory(): Promise<Prompt[]> {
+	const history = await getPromptHistory();
+	return history
+		.map((saved) => {
+			const parts = saved.text.split(' ');
+			const words: [string, string, string] = [
+				parts[0] ?? '',
+				parts[1] ?? '',
+				parts[2] ?? '',
+			];
+			return {
+				words,
+				createdAt: saved.createdAt,
+			};
+		})
+		.reverse();
+}
+
+export async function hasPromptHistory(): Promise<boolean> {
+	const history = await getPromptHistory();
+	return history.length > 0;
 }

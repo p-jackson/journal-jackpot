@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Header } from '../components/ui/header';
 import { Link } from '../components/ui/link';
+import { useHasPromptHistory } from '../hooks/use-has-prompt-history';
 import {
 	SpaceGrotesk_400Regular,
 	SpaceGrotesk_500Medium,
@@ -43,6 +44,7 @@ export default function RootLayout() {
 		IBMPlexMono_600SemiBold,
 	});
 	const pathname = usePathname();
+	const { hasHistory } = useHasPromptHistory();
 
 	useEffect(() => {
 		if (fontsLoaded || fontError) {
@@ -69,7 +71,7 @@ export default function RootLayout() {
 					<Text variant="page-title">{pageTitle}</Text>
 				</Header.Center>
 				<Header.Right>
-					{isHome && (
+					{isHome && hasHistory && (
 						<Link href="/history" label="History" icon="time-outline" />
 					)}
 				</Header.Right>

@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   savePrompt,
   getPromptHistory,
+  getPromptsForHistory,
+  hasPromptHistory,
   getTodaysPrompt,
   getLastSpinDate,
   setLastSpinDate,
@@ -153,6 +155,77 @@ describe('promptStorage', () => {
       await setLastSpinDate(lastNight);
 
       const result = await canSpinToday();
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('getPromptsForHistory', () => {
+    it('returns empty array when no history', async () => {
+      const prompts = await getPromptsForHistory();
+      expect(prompts).toEqual([]);
+    });
+
+    it('returns prompts sorted newest first', async () => {
+      const prompt1: SavedPrompt = {
+        text: 'a b c',
+        createdAt: '2024-01-15T10:00:00.000Z',
+      };
+      const prompt2: SavedPrompt = {
+        text: 'd e f',
+        createdAt: '2024-01-16T10:00:00.000Z',
+      };
+      const prompt3: SavedPrompt = {
+        text: 'g h i',
+        createdAt: '2024-01-17T10:00:00.000Z',
+      };
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify([prompt1, prompt2, prompt3])
+      );
+
+      const prompts = await getPromptsForHistory();
+      expect(prompts[0].createdAt).toBe('2024-01-17T10:00:00.000Z');
+      expect(prompts[1].createdAt).toBe('2024-01-16T10:00:00.000Z');
+      expect(prompts[2].createdAt).toBe('2024-01-15T10:00:00.000Z');
+    });
+
+    it('converts SavedPrompt to Prompt', async () => {
+      const saved: SavedPrompt = {
+        text: 'word1 word2 word3',
+        createdAt: '2024-01-15T10:00:00.000Z',
+      };
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify([saved])
+      );
+
+      const prompts = await getPromptsForHistory();
+      expect(prompts).toEqual([
+        {
+          words: ['word1', 'word2', 'word3'],
+          createdAt: '2024-01-15T10:00:00.000Z',
+        },
+      ]);
+    });
+  });
+
+  describe('hasPromptHistory', () => {
+    it('returns false when no history', async () => {
+      const result = await hasPromptHistory();
+      expect(result).toBe(false);
+    });
+
+    it('returns true when history exists', async () => {
+      const prompt: SavedPrompt = {
+        text: 'a b c',
+        createdAt: '2024-01-15T10:00:00.000Z',
+      };
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.PROMPT_HISTORY,
+        JSON.stringify([prompt])
+      );
+
+      const result = await hasPromptHistory();
       expect(result).toBe(true);
     });
   });

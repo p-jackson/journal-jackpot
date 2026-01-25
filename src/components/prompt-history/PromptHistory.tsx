@@ -1,0 +1,91 @@
+import { View, ScrollView } from 'react-native';
+import { Text } from '../ui/text';
+import type { Prompt } from '../../types';
+
+interface PromptHistoryProps {
+	prompts: Prompt[];
+	journeyStartDate: string | null;
+}
+
+function formatDate(dateString: string): string {
+	const date = new Date(dateString);
+	const now = new Date();
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	const dateDay = new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate()
+	);
+
+	const diffMs = today.getTime() - dateDay.getTime();
+	const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+	if (diffDays === 0) return 'Today';
+	if (diffDays === 1) return 'Yesterday';
+	if (diffDays <= 6) return `${diffDays} days ago`;
+
+	const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+	return `${dayName} ${date.getDate()}`;
+}
+
+function EmptyState() {
+	return (
+		<View className="flex-1 items-center justify-center px-8">
+			<Text className="text-4xl mb-4">📝</Text>
+			<Text variant="muted" className="text-center">
+				No prompts yet. Spin the slot machine to get your first writing prompt!
+			</Text>
+		</View>
+	);
+}
+
+interface PromptCardProps {
+	prompt: Prompt;
+	isLast: boolean;
+}
+
+function PromptCard({ prompt, isLast }: PromptCardProps) {
+	return (
+		<View className="flex-row">
+			{/* Timeline connector */}
+			<View className="items-center mr-4">
+				<View className="w-3 h-3 rounded-full bg-primary" />
+				{!isLast && <View className="flex-1 w-0.5 bg-border dark:bg-border-dark" />}
+			</View>
+			{/* Card content */}
+			<View className="flex-1 pb-6">
+				<Text variant="body-sm" className="mb-1">
+					{formatDate(prompt.createdAt)}
+				</Text>
+				<View className="bg-white dark:bg-zinc-900 rounded-lg p-4 border border-border dark:border-border-dark">
+					<Text className="font-mono text-base">
+						{prompt.words.join(' · ')}
+					</Text>
+				</View>
+			</View>
+		</View>
+	);
+}
+
+export function PromptHistory({ prompts, journeyStartDate }: PromptHistoryProps) {
+	if (prompts.length === 0) {
+		return <EmptyState />;
+	}
+
+	const promptCount = prompts.length === 1 ? '1 prompt' : `${prompts.length} prompts`;
+
+	return (
+		<ScrollView className="flex-1" contentContainerClassName="px-4 py-6">
+			<Text variant="muted" className="mb-4 text-center">
+				{promptCount} since your journey began
+			</Text>
+			{prompts.map((prompt, index) => (
+				<PromptCard
+					key={prompt.createdAt}
+					prompt={prompt}
+					isLast={index === prompts.length - 1}
+				/>
+			))}
+		</ScrollView>
+	);
+}
