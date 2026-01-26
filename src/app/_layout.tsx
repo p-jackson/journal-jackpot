@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Alert, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Text } from "../components/ui/text";
+import type { ErrorBoundaryProps } from "expo-router";
 import { Slot, usePathname } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
@@ -33,6 +34,25 @@ import * as SplashScreen from "expo-splash-screen";
 import type { SavedPrompt } from "../types";
 import "../../global.css";
 
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <View className="flex-1 bg-surface dark:bg-surface-dark justify-center items-center px-6">
+      <SafeAreaView>
+        <Text variant="page-title" className="mb-4 text-center">
+          Something went wrong
+        </Text>
+        <Text className="mb-6 text-center font-mono">{error.message}</Text>
+        <Pressable
+          onPress={() => void retry()}
+          className="bg-primary px-6 py-3 rounded-lg active:opacity-80"
+        >
+          <Text className="text-white font-semibold text-center">Refresh</Text>
+        </Pressable>
+      </SafeAreaView>
+    </View>
+  );
+}
+
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -51,19 +71,28 @@ export default function RootLayout() {
   });
   const [history, setHistory] = useState<SavedPrompt[] | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   useEffect(() => {
-    void getPromptHistory().then(setHistory);
+    getPromptHistory().then(setHistory).catch(setAsyncError);
   }, [resetKey]);
 
   useEffect(() => {
     if ((fontsLoaded || fontError) && history !== null) {
-      void SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(setAsyncError);
     }
   }, [fontsLoaded, fontError, history]);
 
+  // Rethrow async errors so ErrorBoundary catches them
+  if (asyncError) {
+    throw asyncError;
+  }
+  if (fontError) {
+    throw fontError;
+  }
+
   // Wait for fonts AND history
-  if ((!fontsLoaded && !fontError) || history === null) {
+  if (!fontsLoaded || history === null) {
     return null;
   }
 
@@ -74,10 +103,12 @@ export default function RootLayout() {
         text: "Reset",
         style: "destructive",
         onPress: () => {
-          void clearAllData().then(() => {
-            setHistory(null); // Clear state so we reload fresh
-            setResetKey((k) => k + 1);
-          });
+          clearAllData()
+            .then(() => {
+              setHistory(null);
+              setResetKey((k) => k + 1);
+            })
+            .catch(setAsyncError);
         },
       },
     ]);
@@ -90,41 +121,34 @@ export default function RootLayout() {
   );
 }
 
-function AppShell({ onReset }: { onReset: () => void }) {
+interface AppShellProps {
+  onReset: () => void;
+}
+
+function AppShell({ onReset }: AppShellProps): React.ReactElement {
   const pathname = usePathname();
   const [history] = usePromptStorage();
-  const hasHistory = history.length >= 2;
 
   const isHome = pathname === "/";
-  const pageTitle = isHome ? "Journal Jackpot" : "History";
+  const hasHistory = history.length >= 2;
 
   return (
     <View className="flex-1 bg-surface dark:bg-surface-dark">
       <SafeAreaView style={{ flex: 1 }}>
-        {!isHome && (
-          <Header>
-            <Header.Left>
-              <Link href="back" label="Back" icon="chevron-back" />
-            </Header.Left>
-            <Header.Center>
-              <Text variant="page-title">{pageTitle}</Text>
-            </Header.Center>
-            <Header.Right />
-          </Header>
-        )}
-        {isHome && __DEV__ && (
-          <View className="flex-row justify-between px-4 pt-1">
-            <DevResetButton onPress={onReset} />
-            {hasHistory && (
+        <Header>
+          <Header.Left>
+            {!isHome && <Link href="back" label="Back" icon="chevron-back" />}
+            {isHome && __DEV__ && <DevResetButton onPress={onReset} />}
+          </Header.Left>
+          <Header.Center>
+            {!isHome && <Text variant="page-title">History</Text>}
+          </Header.Center>
+          <Header.Right>
+            {isHome && hasHistory && (
               <Link href="/history" label="History" icon="time-outline" />
             )}
-          </View>
-        )}
-        {isHome && !__DEV__ && hasHistory && (
-          <View className="flex-row justify-end px-4 pt-1">
-            <Link href="/history" label="History" icon="time-outline" />
-          </View>
-        )}
+          </Header.Right>
+        </Header>
         <View className="flex-1 w-full">
           <Slot />
         </View>

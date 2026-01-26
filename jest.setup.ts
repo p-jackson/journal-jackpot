@@ -21,8 +21,8 @@ jest.mock("expo-font", () => ({
 
 // Mock expo-splash-screen
 jest.mock("expo-splash-screen", () => ({
-  preventAutoHideAsync: jest.fn(),
-  hideAsync: jest.fn(),
+  preventAutoHideAsync: jest.fn().mockResolvedValue(false),
+  hideAsync: jest.fn().mockResolvedValue(undefined),
 }));
 
 // Mock expo-linear-gradient
