@@ -1,8 +1,8 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSlotMachine } from "./use-slot-machine";
-import { PromptStorageProvider } from "../contexts/prompt-storage-context";
+import { useSlotMachine } from "../use-slot-machine";
+import { PromptStorageProvider } from "../prompt-storage-context";
 import type { SavedPrompt } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
@@ -23,14 +23,6 @@ describe("useSlotMachine", () => {
   });
 
   describe("initial state", () => {
-    it("loading is always false (loaded before mount)", () => {
-      const { result } = renderHook(() => useSlotMachine(), {
-        wrapper: wrapper([]),
-      });
-
-      expect(result.current.loading).toBe(false);
-    });
-
     it("canSpin true when no previous spin", () => {
       const { result } = renderHook(() => useSlotMachine(), {
         wrapper: wrapper([]),

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { savePrompt as rawSavePrompt } from "../storage/prompt-storage";
-import type { SavedPrompt } from "../types";
+import { savePrompt as rawSavePrompt } from "./prompt-storage";
+import type { SavedPrompt } from "./types";
 
 interface PromptStorageContextValue {
   history: SavedPrompt[];

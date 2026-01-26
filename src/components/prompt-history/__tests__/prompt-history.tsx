@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react-native";
-import { PromptHistory } from "./PromptHistory";
-import type { SavedPrompt } from "../../types";
+import { PromptHistory } from "../PromptHistory";
+import type { SavedPrompt } from "../../../types";
 
 describe("PromptHistory", () => {
   describe("empty state", () => {

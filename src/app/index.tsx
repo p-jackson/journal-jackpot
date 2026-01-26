@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View } from "react-native";
 import { Text } from "../components/ui/text";
-import { useSlotMachine } from "../hooks/use-slot-machine";
+import { useSlotMachine } from "../use-slot-machine";
 import { SlotMachine } from "../components/slot-machine/slot-machine";
 import { SpinButton } from "../components/slot-machine/spin-button";
 import { Celebration } from "../components/slot-machine/celebration";
@@ -11,7 +11,7 @@ import { MachineTopBanner } from "../components/slot-machine/machine-top-banner"
 import { MachineLights } from "../components/slot-machine/machine-lights";
 
 export default function Home() {
-  const { reels, loading, spinning, canSpin, todaysPrompt, nextSpinAt, spin } =
+  const { reels, spinning, canSpin, todaysPrompt, nextSpinAt, spin } =
     useSlotMachine();
 
   const [showCelebration, setShowCelebration] = useState(false);
@@ -38,14 +38,6 @@ export default function Home() {
   const handleCelebrationComplete = useCallback(() => {
     setShowCelebration(false);
   }, []);
-
-  if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#7c3aed" />
-      </View>
-    );
-  }
 
   const displayWords = todaysPrompt?.words ?? reelWords;
 

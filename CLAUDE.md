@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Commands
 
 ```bash
@@ -24,15 +22,12 @@ Expo React Native app (iOS only, portrait). New arch enabled.
 ```
 src/
   app/              # expo-router routes (_layout.tsx, index.tsx, history.tsx)
-  components/
-    ui/             # reusable primitives (header, text, link)
-    slot-machine/   # feature components (reel, spin-button, etc.)
-    prompt-history/ # timeline list
-  contexts/         # PromptStorageContext (history state)
-  hooks/            # useSlotMachine (spin logic, daily limits)
-  storage/          # AsyncStorage abstraction
-  data/             # reel word data
-  types.ts          # shared types
+  components/       # ui/, slot-machine/, prompt-history/
+  prompt-storage-context.tsx  # history state context
+  use-slot-machine.ts         # spin logic, daily limits
+  prompt-storage.ts           # AsyncStorage abstraction
+  reels-data.ts               # reel word data
+  types.ts                    # shared types
 ```
 
 ### Styling
@@ -46,7 +41,7 @@ NativeWind v5 + Tailwind v4. Theme vars in `global.css`.
 ### State
 
 - Context: `PromptStorageContext` for history + save
-- Storage: AsyncStorage via `src/storage/prompt-storage.ts`
+- Storage: AsyncStorage via `src/prompt-storage.ts`
 - One spin per day (unlimited in __DEV__)
 
 ## Standards
@@ -66,6 +61,8 @@ NativeWind v5 + Tailwind v4. Theme vars in `global.css`.
 
 ### Testing
 
-- Colocated: `foo.tsx` → `foo.test.tsx` (no `__tests__/`)
+- App route tests in root `__tests__/` (Expo Router requirement)
+- Component/hook tests in colocated `__tests__/` folders
 - Integration tests use `expo-router/testing-library` with `renderRouter()`
 - Mocks in `__mocks__/` and `jest.setup.ts`
+- Do not do snapshot testing, prefer user-centric assertions using `@testing-library/react-native`

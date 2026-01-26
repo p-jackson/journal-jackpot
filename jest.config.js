@@ -11,5 +11,5 @@ module.exports = {
       "<rootDir>/__mocks__/react-native-reanimated-impl.tsx",
   },
   collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/**/*.d.ts"],
-  testMatch: ["**/*.test.{ts,tsx}"],
+  testMatch: ["**/__tests__/**/*.{ts,tsx}"],
 };

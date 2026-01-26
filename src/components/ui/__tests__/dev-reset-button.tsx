@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
-import { DevResetButton } from "./dev-reset-button";
+import { DevResetButton } from "../dev-reset-button";
 
 describe("DevResetButton", () => {
   it("renders reset label", () => {

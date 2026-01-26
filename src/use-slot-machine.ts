@@ -1,15 +1,14 @@
 import { useState, useCallback, useMemo } from "react";
 import { isSameDay } from "date-fns";
-import { usePromptStorage } from "../contexts/prompt-storage-context";
-import { REELS } from "../data/reels";
-import type { Prompt, Reel } from "../types";
+import { usePromptStorage } from "./prompt-storage-context";
+import { REELS } from "./reels-data";
+import type { Prompt, Reel } from "./types";
 
 // Enable infinite spins in dev mode (but not tests)
 const DEBUG_ALLOW_INFINITE_SPINS = __DEV__ && process.env.NODE_ENV !== "test";
 
 interface UseSlotMachineReturn {
   reels: Reel[];
-  loading: boolean;
   spinning: boolean;
   canSpin: boolean;
   todaysPrompt: Prompt | null;
@@ -83,7 +82,6 @@ export function useSlotMachine(): UseSlotMachineReturn {
 
   return {
     reels: REELS,
-    loading: false,
     spinning,
     canSpin,
     todaysPrompt,

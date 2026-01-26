@@ -11,8 +11,8 @@ import { DevResetButton } from "../components/ui/dev-reset-button";
 import {
   PromptStorageProvider,
   usePromptStorage,
-} from "../contexts/prompt-storage-context";
-import { clearAllData, getPromptHistory } from "../storage/prompt-storage";
+} from "../prompt-storage-context";
+import { clearAllData, getPromptHistory } from "../prompt-storage";
 import {
   SpaceGrotesk_400Regular,
   SpaceGrotesk_500Medium,

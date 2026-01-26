@@ -1,25 +1,9 @@
-jest.unmock("expo-router");
-
-import {
-  renderRouter,
-  screen,
-  fireEvent,
-  waitFor,
-} from "expo-router/testing-library";
+import { screen, fireEvent, waitFor } from "expo-router/testing-library";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Home from "./index";
-import History from "./history";
-import RootLayout from "./_layout";
-import type { SavedPrompt } from "../types";
+import { renderApp } from "../src/test-utils";
+import type { SavedPrompt } from "../src/types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
-
-function renderHistory() {
-  return renderRouter(
-    { index: Home, history: History, _layout: RootLayout },
-    { initialUrl: "/history" },
-  );
-}
 
 describe("History", () => {
   beforeEach(async () => {
@@ -33,7 +17,7 @@ describe("History", () => {
     ];
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
 
-    renderHistory();
+    renderApp({ initialUrl: "/history" });
 
     // Latest prompt (a b c) skipped; older one shown
     await waitFor(() => {
@@ -42,7 +26,7 @@ describe("History", () => {
   });
 
   it("shows empty state when no history", async () => {
-    renderHistory();
+    renderApp({ initialUrl: "/history" });
 
     await waitFor(() => {
       expect(screen.getByText(/no prompts yet/i)).toBeTruthy();
@@ -56,10 +40,7 @@ describe("History", () => {
     ];
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
 
-    renderRouter(
-      { index: Home, history: History, _layout: RootLayout },
-      { initialUrl: "/" },
-    );
+    renderApp({ initialUrl: "/" });
 
     await waitFor(() => {
       expect(screen.getByText("JOURNAL JACKPOT")).toBeTruthy();

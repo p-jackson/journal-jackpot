@@ -5,9 +5,10 @@ const config = getDefaultConfig(__dirname);
 
 // Exclude test files from bundling
 config.resolver.blockList = [
-  /.*\.test\.(ts|tsx|js|jsx)$/,
   /.*__mocks__\/.*/,
+  /.*__tests__\/.*/,
   /jest\.setup\..*/,
+  /.*test-utils\.(ts|tsx)$/,
 ];
 
 module.exports = withNativeWind(config);

@@ -82,7 +82,7 @@ export default defineConfig(
 
   // Test files - relaxed rules
   {
-    files: ["**/*.test.ts", "**/*.test.tsx"],
+    files: ["**/__tests__/*.ts", "**/__tests__/*.tsx"],
     rules: {
       // act(async () => {...}) needs async even without await
       "@typescript-eslint/require-await": "off",

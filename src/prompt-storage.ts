@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { SavedPrompt } from "../types";
+import type { SavedPrompt } from "./types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
