@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
+import { userEvent } from "@testing-library/react-native";
 import { DevResetButton } from "../dev-reset-button";
 
 describe("DevResetButton", () => {
@@ -7,10 +8,11 @@ describe("DevResetButton", () => {
     expect(screen.getByText("Reset")).toBeTruthy();
   });
 
-  it("calls onPress when pressed", () => {
+  it("calls onPress when pressed", async () => {
+    const user = userEvent.setup();
     const onPress = jest.fn();
     render(<DevResetButton onPress={onPress} />);
-    fireEvent.press(screen.getByText("Reset"));
+    await user.press(screen.getByText("Reset"));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

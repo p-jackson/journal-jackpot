@@ -1,8 +1,9 @@
 import { Alert } from "react-native";
-import { screen, fireEvent, waitFor, act } from "expo-router/testing-library";
+import { screen, waitFor, act } from "expo-router/testing-library";
+import { userEvent } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { renderApp } from "../src/test-utils";
-import type { SavedPrompt } from "../src/types";
+import { renderApp } from "../test-utils";
+import type { SavedPrompt } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
@@ -33,6 +34,7 @@ describe("Home", () => {
     });
 
     it("generates and displays prompt after spin", async () => {
+      const user = userEvent.setup();
       jest.useFakeTimers();
       renderApp({ initialUrl: "/" });
 
@@ -40,7 +42,7 @@ describe("Home", () => {
         expect(screen.getByText("SPIN")).toBeTruthy();
       });
 
-      fireEvent.press(screen.getByRole("button"));
+      await user.press(screen.getByRole("button"));
       await act(() => jest.advanceTimersByTimeAsync(3000));
 
       await waitFor(() => {
@@ -50,6 +52,7 @@ describe("Home", () => {
     });
 
     it("disables button after spin", async () => {
+      const user = userEvent.setup();
       jest.useFakeTimers();
       renderApp({ initialUrl: "/" });
 
@@ -57,7 +60,7 @@ describe("Home", () => {
         expect(screen.getByText("SPIN")).toBeTruthy();
       });
 
-      fireEvent.press(screen.getByRole("button"));
+      await user.press(screen.getByRole("button"));
       await act(() => jest.advanceTimersByTimeAsync(3000));
 
       await waitFor(() => {
@@ -68,6 +71,7 @@ describe("Home", () => {
     });
 
     it("shows countdown timer after spin", async () => {
+      const user = userEvent.setup();
       jest.useFakeTimers();
       renderApp({ initialUrl: "/" });
 
@@ -75,7 +79,7 @@ describe("Home", () => {
         expect(screen.getByText("SPIN")).toBeTruthy();
       });
 
-      fireEvent.press(screen.getByRole("button"));
+      await user.press(screen.getByRole("button"));
       await act(() => jest.advanceTimersByTimeAsync(3000));
 
       await waitFor(() => {
@@ -137,6 +141,7 @@ describe("Home", () => {
 
   describe("corrupted prompt recovery", () => {
     it("allows re-spin when stored prompt has empty words", async () => {
+      const user = userEvent.setup();
       jest.useFakeTimers();
       const today = new Date();
       await AsyncStorage.setItem(
@@ -153,7 +158,7 @@ describe("Home", () => {
       const button = screen.getByRole("button");
       expect(button).toBeEnabled();
 
-      fireEvent.press(button);
+      await user.press(button);
       await act(() => jest.advanceTimersByTimeAsync(3000));
 
       await waitFor(() => {
@@ -165,6 +170,7 @@ describe("Home", () => {
 
   describe("rapid tap prevention", () => {
     it("prevents multiple spins", async () => {
+      const user = userEvent.setup();
       jest.useFakeTimers();
       renderApp({ initialUrl: "/" });
 
@@ -175,7 +181,7 @@ describe("Home", () => {
       const button = screen.getByRole("button");
 
       // First spin
-      fireEvent.press(button);
+      await user.press(button);
       await act(() => jest.advanceTimersByTimeAsync(3000));
 
       // Button should now be disabled after spin completes
@@ -185,8 +191,8 @@ describe("Home", () => {
       });
 
       // Attempting more presses should not add more prompts
-      fireEvent.press(button);
-      fireEvent.press(button);
+      await user.press(button);
+      await user.press(button);
       await act(() => jest.advanceTimersByTimeAsync(1010));
 
       // Should only have one prompt saved
@@ -209,6 +215,7 @@ describe("Home", () => {
     });
 
     it("hides History link after first spin (only 1 prompt)", async () => {
+      const user = userEvent.setup();
       jest.useFakeTimers();
       renderApp({ initialUrl: "/" });
 
@@ -218,7 +225,7 @@ describe("Home", () => {
 
       expect(screen.queryByText("History")).toBeNull();
 
-      fireEvent.press(screen.getByRole("button"));
+      await user.press(screen.getByRole("button"));
       await act(() => jest.advanceTimersByTimeAsync(3000));
 
       // Still no history link — need 2+ prompts
@@ -253,12 +260,14 @@ describe("Home", () => {
 
       renderApp({ initialUrl: "/" });
 
+      const user = userEvent.setup();
+
       // History link visible before reset
       await waitFor(() => {
         expect(screen.getByText("History")).toBeTruthy();
       });
 
-      fireEvent.press(screen.getByText("Reset"));
+      await user.press(screen.getByText("Reset"));
 
       // After reset, History link should disappear
       await waitFor(() => {

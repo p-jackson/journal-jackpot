@@ -4,14 +4,15 @@ Use `expo-router/testing-library` with real navigation for user flow tests.
 
 ```tsx
 jest.unmock('expo-router');
-import { renderRouter, screen, fireEvent, waitFor } from 'expo-router/testing-library';
+import { renderRouter, screen, userEvent, waitFor } from 'expo-router/testing-library';
 
 renderRouter(
   { index: Home, history: History, _layout: RootLayout },
   { initialUrl: '/' }
 );
 
-fireEvent.press(screen.getByText('History'));
+const user = userEvent.setup();
+await user.press(screen.getByText('History'));
 await waitFor(() => expect(screen.getByText('Back')).toBeTruthy());
 ```
 

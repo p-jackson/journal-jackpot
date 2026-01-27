@@ -1,7 +1,8 @@
-import { screen, fireEvent, waitFor } from "expo-router/testing-library";
+import { screen, waitFor } from "expo-router/testing-library";
+import { userEvent } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { renderApp } from "../src/test-utils";
-import type { SavedPrompt } from "../src/types";
+import { renderApp } from "../test-utils";
+import type { SavedPrompt } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
@@ -34,6 +35,7 @@ describe("History", () => {
   });
 
   it("navigates from home to history and back", async () => {
+    const user = userEvent.setup();
     const prompts: SavedPrompt[] = [
       { text: "older prompt too", createdAt: "2024-01-14T10:00:00.000Z" },
       { text: "test prompt here", createdAt: "2024-01-15T10:00:00.000Z" },
@@ -50,7 +52,7 @@ describe("History", () => {
       expect(screen.getByText("History")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("History"));
+    await user.press(screen.getByText("History"));
 
     // Latest skipped; older prompt shown
     await waitFor(() => {
@@ -58,7 +60,7 @@ describe("History", () => {
     });
     expect(screen.getByText("Back")).toBeTruthy();
 
-    fireEvent.press(screen.getByText("Back"));
+    await user.press(screen.getByText("Back"));
 
     await waitFor(() => {
       expect(screen.getByText("JOURNAL JACKPOT")).toBeTruthy();

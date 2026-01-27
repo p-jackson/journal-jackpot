@@ -1,5 +1,5 @@
 const { getDefaultConfig } = require("expo/metro-config");
-const { withNativeWind } = require("nativewind/metro");
+const { withNativewind } = require("nativewind/metro");
 
 const config = getDefaultConfig(__dirname);
 
@@ -11,4 +11,4 @@ config.resolver.blockList = [
   /.*test-utils\.(ts|tsx)$/,
 ];
 
-module.exports = withNativeWind(config);
+module.exports = withNativewind(config);
