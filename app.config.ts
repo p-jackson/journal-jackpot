@@ -18,6 +18,7 @@ export default ({ config: _config }: ConfigContext): ExpoConfig => ({
     supportsTablet: false,
     bundleIdentifier:
       process.env.IOS_BUNDLE_ID ?? "com.anonymous.journal-jackpot",
+    icon: "./assets/jj.icon",
   },
   plugins: [
     [
