@@ -3,5 +3,5 @@ setUpTests();
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 beforeAll(() => {
-	void AsyncStorage.clear();
+  void AsyncStorage.clear();
 });
