@@ -52,6 +52,8 @@ NativeWind v5 + Tailwind v4. Theme vars in `global.css`.
 - Named exports only
 - `interface` for objects, `type` for unions
 - String unions over enums
+- Use explicit braces (`{}`) for control flow, even for single-line bodies
+- No `any`, and use `unknown` when a type is truly dynamic
 
 ### Components
 

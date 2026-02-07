@@ -37,6 +37,8 @@ export function usePromptStorage(): [
   (prompt: SavedPrompt) => void,
 ] {
   const ctx = useContext(PromptStorageContext);
-  if (!ctx) throw new Error("usePromptStorage requires PromptStorageProvider");
+  if (!ctx) {
+    throw new Error("usePromptStorage requires PromptStorageProvider");
+  }
   return [ctx.history, ctx.savePrompt];
 }

@@ -6,7 +6,9 @@ interface CountdownTimerProps {
 }
 
 function formatTimeLeft(ms: number): string {
-  if (ms <= 0) return "0m";
+  if (ms <= 0) {
+    return "0m";
+  }
 
   const hours = Math.floor(ms / (1000 * 60 * 60));
   const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));

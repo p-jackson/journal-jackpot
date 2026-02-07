@@ -15,9 +15,15 @@ function formatDate(dateString: string): string {
   const diffMs = today.getTime() - dateDay.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays <= 6) return `${String(diffDays)} days ago`;
+  if (diffDays === 0) {
+    return "Today";
+  }
+  if (diffDays === 1) {
+    return "Yesterday";
+  }
+  if (diffDays <= 6) {
+    return `${String(diffDays)} days ago`;
+  }
 
   const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
   return `${dayName} ${String(date.getDate())}`;

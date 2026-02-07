@@ -36,8 +36,9 @@ export function useSlotMachine(): UseSlotMachineReturn {
     const latest = history[history.length - 1] as
       | (typeof history)[number]
       | undefined;
-    if (!latest || !isSameDay(new Date(latest.createdAt), new Date()))
+    if (!latest || !isSameDay(new Date(latest.createdAt), new Date())) {
       return null;
+    }
 
     const parts = latest.text.split(" ");
     if (parts.length !== 3) {
@@ -51,14 +52,18 @@ export function useSlotMachine(): UseSlotMachineReturn {
       parts[2] ?? "",
     ];
     // Allow respin if data is corrupted
-    if (words.some((w) => !w)) return null;
+    if (words.some((w) => !w)) {
+      return null;
+    }
     return { words, createdAt: latest.createdAt };
   }, [history]);
 
   const canSpin = !todaysPrompt || DEBUG_ALLOW_INFINITE_SPINS;
 
   const spin = useCallback(() => {
-    if (!canSpin || spinning) return;
+    if (!canSpin || spinning) {
+      return;
+    }
 
     setSpinning(true);
 

@@ -99,7 +99,9 @@ export function Celebration({ visible, onComplete }: CelebrationProps) {
     opacity: containerOpacity.value,
   }));
 
-  if (!visible) return null;
+  if (!visible) {
+    return null;
+  }
 
   // Generate sparkle positions
   const sparkles: SparkleProps[] = [

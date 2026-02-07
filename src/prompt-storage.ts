@@ -11,7 +11,9 @@ export async function savePrompt(prompt: SavedPrompt) {
 
 export async function getPromptHistory(): Promise<SavedPrompt[]> {
   const stored = await AsyncStorage.getItem(STORAGE_KEY);
-  if (!stored) return [];
+  if (!stored) {
+    return [];
+  }
   return JSON.parse(stored) as SavedPrompt[];
 }
 

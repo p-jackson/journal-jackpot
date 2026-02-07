@@ -23,7 +23,9 @@ export default function Home() {
   const [allReelsStopped, setAllReelsStopped] = useState(true);
 
   const handleSpin = useCallback(() => {
-    if (!canSpin || spinning) return;
+    if (!canSpin || spinning) {
+      return;
+    }
 
     setReelWords([null, null, null]);
     setAllReelsStopped(false);
