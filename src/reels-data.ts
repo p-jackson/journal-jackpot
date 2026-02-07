@@ -1,5 +1,18 @@
 import type { Reel } from "./types";
 
+function getRandomWord(reel: Reel): string {
+  const idx = Math.floor(Math.random() * reel.words.length);
+  return reel.words[idx];
+}
+
+export function getRandomWords(): [string, string, string] {
+  return [
+    getRandomWord(REELS[0]),
+    getRandomWord(REELS[1]),
+    getRandomWord(REELS[2]),
+  ];
+}
+
 export const REELS: Reel[] = [
   {
     position: "1",

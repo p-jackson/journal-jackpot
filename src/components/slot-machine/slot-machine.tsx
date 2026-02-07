@@ -2,10 +2,9 @@ import { useCallback, useRef, useState } from "react";
 import { View } from "react-native";
 import { Reel } from "./reel";
 import { ReelWindow, ReelSeparator } from "./reel-window";
-import type { Reel as ReelType } from "../../types";
+import { REELS } from "../../reels-data";
 
 interface SlotMachineProps {
-  reels: ReelType[];
   spinning: boolean;
   displayWords: (string | null)[];
   onAllReelsStopped?: () => void;
@@ -14,7 +13,6 @@ interface SlotMachineProps {
 const STOP_DELAYS = [1000, 1800, 2600];
 
 export function SlotMachine({
-  reels,
   spinning,
   displayWords,
   onAllReelsStopped,
@@ -30,15 +28,15 @@ export function SlotMachine({
 
   const handleReelStopped = useCallback(() => {
     stoppedCount.current += 1;
-    if (stoppedCount.current === reels.length) {
+    if (stoppedCount.current === REELS.length) {
       setVisualSpinning(false);
       onAllReelsStopped?.();
     }
-  }, [reels.length, onAllReelsStopped]);
+  }, [onAllReelsStopped]);
 
   return (
     <ReelWindow>
-      {reels.map((reel, index) => (
+      {REELS.map((reel, index) => (
         <View key={reel.position} style={{ flex: 1, flexDirection: "row" }}>
           {index > 0 && <ReelSeparator />}
           <Reel
