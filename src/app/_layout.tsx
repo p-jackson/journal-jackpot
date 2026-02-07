@@ -31,7 +31,7 @@ import {
   IBMPlexMono_600SemiBold,
 } from "@expo-google-fonts/ibm-plex-mono";
 import * as SplashScreen from "expo-splash-screen";
-import type { SavedPrompt } from "../types";
+import type { HistoryEntry } from "../types";
 import "../../global.css";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
@@ -69,7 +69,7 @@ export default function RootLayout() {
     IBMPlexMono_500Medium,
     IBMPlexMono_600SemiBold,
   });
-  const [history, setHistory] = useState<SavedPrompt[] | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[] | null>(null);
   const [resetKey, setResetKey] = useState(0);
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 

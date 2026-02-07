@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { savePrompt as rawSavePrompt } from "./prompt-storage";
-import type { SavedPrompt } from "./types";
+import type { HistoryEntry } from "./types";
 
 interface PromptStorageContextValue {
-  history: SavedPrompt[];
-  savePrompt: (prompt: SavedPrompt) => void;
+  history: HistoryEntry[];
+  savePrompt: (prompt: HistoryEntry) => void;
 }
 
 const PromptStorageContext = createContext<PromptStorageContextValue | null>(
@@ -12,14 +12,14 @@ const PromptStorageContext = createContext<PromptStorageContextValue | null>(
 );
 
 interface Props {
-  initialHistory: SavedPrompt[];
+  initialHistory: HistoryEntry[];
   children: React.ReactNode;
 }
 
 export function PromptStorageProvider({ initialHistory, children }: Props) {
   const [history, setHistory] = useState(initialHistory);
 
-  const savePrompt = useCallback((prompt: SavedPrompt) => {
+  const savePrompt = useCallback((prompt: HistoryEntry) => {
     setHistory((prev) => [...prev, prompt]);
     // Fire-and-forget async write
     void rawSavePrompt(prompt);
@@ -33,8 +33,8 @@ export function PromptStorageProvider({ initialHistory, children }: Props) {
 }
 
 export function usePromptStorage(): [
-  SavedPrompt[],
-  (prompt: SavedPrompt) => void,
+  HistoryEntry[],
+  (prompt: HistoryEntry) => void,
 ] {
   const ctx = useContext(PromptStorageContext);
   if (!ctx) {

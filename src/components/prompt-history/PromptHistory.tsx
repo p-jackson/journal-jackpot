@@ -1,19 +1,14 @@
 import { View, ScrollView } from "react-native";
+import { differenceInCalendarDays, format } from "date-fns";
 import { Text } from "../ui/text";
-import type { SavedPrompt } from "../../types";
+import type { HistoryEntry } from "../../types";
 
 interface PromptHistoryProps {
-  prompts: SavedPrompt[];
+  prompts: HistoryEntry[];
 }
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const dateDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-  const diffMs = today.getTime() - dateDay.getTime();
-  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+function formatDate(date: Date): string {
+  const diffDays = differenceInCalendarDays(new Date(), date);
 
   if (diffDays === 0) {
     return "Today";
@@ -25,8 +20,7 @@ function formatDate(dateString: string): string {
     return `${String(diffDays)} days ago`;
   }
 
-  const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
-  return `${dayName} ${String(date.getDate())}`;
+  return format(date, "EEE d");
 }
 
 function EmptyState() {
@@ -41,7 +35,7 @@ function EmptyState() {
 }
 
 interface PromptCardProps {
-  prompt: SavedPrompt;
+  prompt: HistoryEntry;
   isLast: boolean;
 }
 
@@ -77,7 +71,7 @@ export function PromptHistory({ prompts }: PromptHistoryProps) {
     <ScrollView className="flex-1" contentContainerClassName="px-4 py-6">
       {pastPrompts.map((prompt, index) => (
         <PromptCard
-          key={prompt.createdAt}
+          key={prompt.createdAt.toISOString()}
           prompt={prompt}
           isLast={index === pastPrompts.length - 1}
         />

@@ -1,13 +1,14 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { startOfTomorrow } from "date-fns";
 import { useSlotMachine } from "../use-slot-machine";
 import { PromptStorageProvider } from "../prompt-storage-context";
-import type { SavedPrompt } from "../types";
+import type { HistoryEntry } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
-function wrapper(initialHistory: SavedPrompt[] = []) {
+function wrapper(initialHistory: HistoryEntry[] = []) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <PromptStorageProvider initialHistory={initialHistory}>
@@ -34,9 +35,7 @@ describe("useSlotMachine", () => {
 
     it("allows re-spin when stored prompt is corrupted", () => {
       const today = new Date();
-      const history: SavedPrompt[] = [
-        { text: "  ", createdAt: today.toISOString() },
-      ];
+      const history: HistoryEntry[] = [{ text: "  ", createdAt: today }];
 
       const { result } = renderHook(() => useSlotMachine(), {
         wrapper: wrapper(history),
@@ -48,19 +47,19 @@ describe("useSlotMachine", () => {
 
     it("loads existing prompt if spun today", () => {
       const today = new Date();
-      const savedPrompt: SavedPrompt = {
+      const historyEntry: HistoryEntry = {
         text: "a b c",
-        createdAt: today.toISOString(),
+        createdAt: today,
       };
 
       const { result } = renderHook(() => useSlotMachine(), {
-        wrapper: wrapper([savedPrompt]),
+        wrapper: wrapper([historyEntry]),
       });
 
       expect(result.current.canSpin).toBe(false);
       expect(result.current.todaysPrompt).toEqual({
         words: ["a", "b", "c"],
-        createdAt: savedPrompt.createdAt,
+        createdAt: historyEntry.createdAt,
       });
     });
   });
@@ -176,11 +175,7 @@ describe("useSlotMachine", () => {
         result.current.spin();
       });
 
-      expect(result.current.nextSpinAt).not.toBeNull();
-      const nextSpin = new Date(result.current.nextSpinAt!);
-      expect(nextSpin.getHours()).toBe(0);
-      expect(nextSpin.getMinutes()).toBe(0);
-      expect(nextSpin.getSeconds()).toBe(0);
+      expect(result.current.nextSpinAt).toEqual(startOfTomorrow());
     });
   });
 

@@ -2,7 +2,6 @@ import { screen, waitFor } from "expo-router/testing-library";
 import { userEvent } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { renderApp } from "../test-utils";
-import type { SavedPrompt } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
@@ -12,7 +11,7 @@ describe("History", () => {
   });
 
   it("shows content after loading", async () => {
-    const prompts: SavedPrompt[] = [
+    const prompts = [
       { text: "d e f", createdAt: "2024-01-14T10:00:00.000Z" },
       { text: "a b c", createdAt: "2024-01-15T10:00:00.000Z" },
     ];
@@ -36,7 +35,7 @@ describe("History", () => {
 
   it("navigates from home to history and back", async () => {
     const user = userEvent.setup();
-    const prompts: SavedPrompt[] = [
+    const prompts = [
       { text: "older prompt too", createdAt: "2024-01-14T10:00:00.000Z" },
       { text: "test prompt here", createdAt: "2024-01-15T10:00:00.000Z" },
     ];

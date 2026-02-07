@@ -3,7 +3,6 @@ import { screen, waitFor, act } from "expo-router/testing-library";
 import { userEvent } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { renderApp } from "../test-utils";
-import type { SavedPrompt } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
@@ -92,7 +91,7 @@ describe("Home", () => {
   describe("already spun today", () => {
     it("shows todays prompt on load", async () => {
       const today = new Date();
-      const prompt: SavedPrompt = {
+      const prompt = {
         text: "favourite childhood sandwich",
         createdAt: today.toISOString(),
       };
@@ -109,7 +108,7 @@ describe("Home", () => {
 
     it("shows disabled button", async () => {
       const today = new Date();
-      const prompt: SavedPrompt = {
+      const prompt = {
         text: "first morning adventure",
         createdAt: today.toISOString(),
       };
@@ -125,7 +124,7 @@ describe("Home", () => {
 
     it("shows countdown timer", async () => {
       const today = new Date();
-      const prompt: SavedPrompt = {
+      const prompt = {
         text: "last summer meal",
         createdAt: today.toISOString(),
       };
@@ -244,7 +243,7 @@ describe("Home", () => {
     });
 
     it("clears data and refreshes UI on reset", async () => {
-      const prompts: SavedPrompt[] = [
+      const prompts = [
         { text: "older prompt too", createdAt: "2024-01-14T10:00:00.000Z" },
         { text: "test prompt here", createdAt: "2024-01-15T10:00:00.000Z" },
       ];

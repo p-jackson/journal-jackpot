@@ -12,25 +12,25 @@ describe("CountdownTimer", () => {
   });
 
   it("displays hours and minutes when target is >1hr away", () => {
-    render(<CountdownTimer targetDate="2024-01-01T14:30:00" />);
+    render(<CountdownTimer targetDate={new Date("2024-01-01T14:30:00")} />);
 
     expect(screen.getByText("2h 30m until next spin")).toBeOnTheScreen();
   });
 
   it("displays only minutes when target is <1hr away", () => {
-    render(<CountdownTimer targetDate="2024-01-01T12:45:00" />);
+    render(<CountdownTimer targetDate={new Date("2024-01-01T12:45:00")} />);
 
     expect(screen.getByText("45m until next spin")).toBeOnTheScreen();
   });
 
   it("displays 0m when target is in the past", () => {
-    render(<CountdownTimer targetDate="2024-01-01T11:00:00" />);
+    render(<CountdownTimer targetDate={new Date("2024-01-01T11:00:00")} />);
 
     expect(screen.getByText("0m until next spin")).toBeOnTheScreen();
   });
 
   it("updates time when interval fires", () => {
-    render(<CountdownTimer targetDate="2024-01-01T12:45:00" />);
+    render(<CountdownTimer targetDate={new Date("2024-01-01T12:45:00")} />);
 
     expect(screen.getByText("45m until next spin")).toBeOnTheScreen();
 
@@ -42,7 +42,7 @@ describe("CountdownTimer", () => {
   });
 
   it("clears interval when countdown expires", () => {
-    render(<CountdownTimer targetDate="2024-01-01T12:01:00" />);
+    render(<CountdownTimer targetDate={new Date("2024-01-01T12:01:00")} />);
 
     expect(screen.getByText("1m until next spin")).toBeOnTheScreen();
 

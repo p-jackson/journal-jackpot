@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react-native";
+import { format, subDays } from "date-fns";
 import { PromptHistory } from "../PromptHistory";
-import type { SavedPrompt } from "../../../types";
+import type { HistoryEntry } from "../../../types";
 
 describe("PromptHistory", () => {
   describe("empty state", () => {
@@ -11,10 +12,10 @@ describe("PromptHistory", () => {
   });
 
   describe("with prompts", () => {
-    const mockPrompts: SavedPrompt[] = [
-      { text: "a b c", createdAt: "2024-01-17T10:00:00.000Z" },
-      { text: "d e f", createdAt: "2024-01-16T10:00:00.000Z" },
-      { text: "g h i", createdAt: "2024-01-15T10:00:00.000Z" },
+    const mockPrompts: HistoryEntry[] = [
+      { text: "a b c", createdAt: new Date("2024-01-17T10:00:00.000Z") },
+      { text: "d e f", createdAt: new Date("2024-01-16T10:00:00.000Z") },
+      { text: "g h i", createdAt: new Date("2024-01-15T10:00:00.000Z") },
     ];
 
     it("skips latest prompt and renders past prompts", () => {
@@ -44,46 +45,33 @@ describe("PromptHistory", () => {
       jest.useRealTimers();
     });
 
-    function getDateString(daysAgo: number): string {
-      const date = new Date();
-      date.setHours(10, 0, 0, 0);
-      date.setDate(date.getDate() - daysAgo);
-      return date.toISOString();
-    }
-
     // Each date test needs 2 prompts: a newest (skipped) + the one under test
-    function makePrompts(createdAt: string): SavedPrompt[] {
+    function makePrompts(createdAt: Date): HistoryEntry[] {
       return [
-        { text: "x y z", createdAt: getDateString(0) }, // newest, skipped
+        { text: "x y z", createdAt: new Date() }, // newest, skipped
         { text: "a b c", createdAt },
       ];
     }
 
     it('formats today as "Today"', () => {
-      const prompts = makePrompts(getDateString(0));
-      render(<PromptHistory prompts={prompts} />);
+      render(<PromptHistory prompts={makePrompts(new Date())} />);
       expect(screen.getByText("Today")).toBeTruthy();
     });
 
     it('formats yesterday as "Yesterday"', () => {
-      const prompts = makePrompts(getDateString(1));
-      render(<PromptHistory prompts={prompts} />);
+      render(<PromptHistory prompts={makePrompts(subDays(new Date(), 1))} />);
       expect(screen.getByText("Yesterday")).toBeTruthy();
     });
 
     it('formats 3 days ago as "3 days ago"', () => {
-      const prompts = makePrompts(getDateString(3));
-      render(<PromptHistory prompts={prompts} />);
+      render(<PromptHistory prompts={makePrompts(subDays(new Date(), 3))} />);
       expect(screen.getByText("3 days ago")).toBeTruthy();
     });
 
     it("formats older dates as weekday + day", () => {
-      const createdAt = getDateString(9);
-      const prompts = makePrompts(createdAt);
-      render(<PromptHistory prompts={prompts} />);
-      const date = new Date(createdAt);
-      const expected = `${date.toLocaleDateString("en-US", { weekday: "short" })} ${String(date.getDate())}`;
-      expect(screen.getByText(expected)).toBeTruthy();
+      const createdAt = subDays(new Date(), 9);
+      render(<PromptHistory prompts={makePrompts(createdAt)} />);
+      expect(screen.getByText(format(createdAt, "EEE d"))).toBeTruthy();
     });
   });
 });

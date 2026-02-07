@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { savePrompt, getPromptHistory, clearAllData } from "../prompt-storage";
-import type { SavedPrompt } from "../types";
+import type { HistoryEntry } from "../types";
 
 const STORAGE_KEY = "journal-jackpot:prompt-history";
 
@@ -10,33 +10,38 @@ describe("promptStorage", () => {
   });
 
   describe("savePrompt", () => {
-    it("saves prompt to history", async () => {
-      const prompt: SavedPrompt = {
+    it("saves prompt to history (serialized as ISO string)", async () => {
+      const prompt: HistoryEntry = {
         text: "word1 word2 word3",
-        createdAt: "2024-01-15T10:00:00.000Z",
+        createdAt: new Date("2024-01-15T10:00:00Z"),
       };
 
       await savePrompt(prompt);
 
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      expect(JSON.parse(stored!)).toEqual([prompt]);
+      expect(JSON.parse(stored!)).toEqual([
+        { text: "word1 word2 word3", createdAt: "2024-01-15T10:00:00.000Z" },
+      ]);
     });
 
     it("appends to existing history", async () => {
-      const prompt1: SavedPrompt = {
+      const prompt1: HistoryEntry = {
         text: "a b c",
-        createdAt: "2024-01-15T10:00:00.000Z",
+        createdAt: new Date("2024-01-15T10:00:00Z"),
       };
-      const prompt2: SavedPrompt = {
+      const prompt2: HistoryEntry = {
         text: "d e f",
-        createdAt: "2024-01-16T10:00:00.000Z",
+        createdAt: new Date("2024-01-16T10:00:00Z"),
       };
 
       await savePrompt(prompt1);
       await savePrompt(prompt2);
 
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      expect(JSON.parse(stored!)).toEqual([prompt1, prompt2]);
+      expect(JSON.parse(stored!)).toEqual([
+        { text: "a b c", createdAt: "2024-01-15T10:00:00.000Z" },
+        { text: "d e f", createdAt: "2024-01-16T10:00:00.000Z" },
+      ]);
     });
   });
 
@@ -46,23 +51,25 @@ describe("promptStorage", () => {
       expect(history).toEqual([]);
     });
 
-    it("returns saved prompts", async () => {
-      const prompt: SavedPrompt = {
+    it("returns saved prompts (deserialized as Date)", async () => {
+      const storedPrompt = {
         text: "x y z",
         createdAt: "2024-01-15T10:00:00.000Z",
       };
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([prompt]));
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([storedPrompt]));
 
       const history = await getPromptHistory();
-      expect(history).toEqual([prompt]);
+      expect(history).toEqual([
+        { text: "x y z", createdAt: new Date("2024-01-15T10:00:00Z") },
+      ]);
     });
   });
 
   describe("clearAllData", () => {
     it("clears all stored data", async () => {
-      const prompt: SavedPrompt = {
+      const prompt: HistoryEntry = {
         text: "a b c",
-        createdAt: "2024-01-15T10:00:00.000Z",
+        createdAt: new Date("2024-01-15T10:00:00Z"),
       };
       await savePrompt(prompt);
 

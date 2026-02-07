@@ -1,22 +1,20 @@
-interface Reel {
+export interface Reel {
   position: "1" | "2" | "3";
   words: string[];
 }
 
-interface Prompt {
+export interface Prompt {
   words: [string, string, string];
-  createdAt: string;
+  createdAt: Date;
 }
 
-interface SavedPrompt {
+export interface HistoryEntry {
   text: string;
-  createdAt: string;
+  createdAt: Date;
 }
 
-interface SlotMachineState {
+export interface SlotMachineState {
   canSpin: boolean;
   todaysPrompt: Prompt | null;
-  nextSpinAt: string | null;
+  nextSpinAt: Date | null;
 }
-
-export type { Reel, Prompt, SavedPrompt, SlotMachineState };

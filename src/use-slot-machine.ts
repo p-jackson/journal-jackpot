@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { isSameDay } from "date-fns";
+import { isSameDay, startOfTomorrow } from "date-fns";
 import { usePromptStorage } from "./prompt-storage-context";
 import { REELS } from "./reels-data";
 import type { Prompt, Reel } from "./types";
@@ -12,20 +12,13 @@ interface UseSlotMachineReturn {
   spinning: boolean;
   canSpin: boolean;
   todaysPrompt: Prompt | null;
-  nextSpinAt: string | null;
+  nextSpinAt: Date | null;
   spin: () => void;
 }
 
 function getRandomWord(reel: Reel): string {
   const idx = Math.floor(Math.random() * reel.words.length);
   return reel.words[idx];
-}
-
-function getNextMidnight(): Date {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  return tomorrow;
 }
 
 export function useSlotMachine(): UseSlotMachineReturn {
@@ -36,7 +29,7 @@ export function useSlotMachine(): UseSlotMachineReturn {
     const latest = history[history.length - 1] as
       | (typeof history)[number]
       | undefined;
-    if (!latest || !isSameDay(new Date(latest.createdAt), new Date())) {
+    if (!latest || !isSameDay(latest.createdAt, new Date())) {
       return null;
     }
 
@@ -73,7 +66,7 @@ export function useSlotMachine(): UseSlotMachineReturn {
       getRandomWord(REELS[2]),
     ];
 
-    const createdAt = new Date().toISOString();
+    const createdAt = new Date();
     savePrompt({ text: words.join(" "), createdAt });
 
     // Delay setSpinning(false) so React renders with spinning=true first
@@ -83,7 +76,7 @@ export function useSlotMachine(): UseSlotMachineReturn {
     });
   }, [canSpin, spinning, savePrompt]);
 
-  const nextSpinAt = todaysPrompt ? getNextMidnight().toISOString() : null;
+  const nextSpinAt = todaysPrompt ? startOfTomorrow() : null;
 
   return {
     reels: REELS,

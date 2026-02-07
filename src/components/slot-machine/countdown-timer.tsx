@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Text } from "../ui/text";
 
 interface CountdownTimerProps {
-  targetDate: string;
+  targetDate: Date;
 }
 
 function formatTimeLeft(ms: number): string {
@@ -21,12 +21,12 @@ function formatTimeLeft(ms: number): string {
 
 export function CountdownTimer({ targetDate }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState(() => {
-    return new Date(targetDate).getTime() - Date.now();
+    return targetDate.getTime() - Date.now();
   });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const remaining = new Date(targetDate).getTime() - Date.now();
+      const remaining = targetDate.getTime() - Date.now();
       setTimeLeft(remaining);
 
       if (remaining <= 0) {
