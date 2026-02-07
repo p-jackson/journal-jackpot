@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { View } from "react-native";
+import { Center } from "../components/ui/center";
+import { VStack } from "../components/ui/stack";
 import { isSameDay, startOfTomorrow } from "date-fns";
 import { Text } from "../components/ui/text";
 import { usePromptStorage } from "../prompt-storage-context";
@@ -84,17 +86,17 @@ export default function Home() {
   const displayWords = todaysPrompt?.words ?? reelWords;
 
   return (
-    <View className="flex-1 items-center justify-center px-6 relative">
+    <Center className="flex-1 relative">
       <Celebration
         visible={showCelebration}
         onComplete={handleCelebrationComplete}
       />
 
-      <View style={{ position: "relative", alignSelf: "stretch" }}>
+      <View className="relative self-stretch">
         <MachineBody>
           <MachineTopBanner />
 
-          <View style={{ marginBottom: 16 }}>
+          <View className="mb-4">
             <SlotMachine
               spinning={spinning}
               displayWords={displayWords}
@@ -103,19 +105,19 @@ export default function Home() {
           </View>
 
           {/* Bottom panel */}
-          <View style={{ alignItems: "center", gap: 12 }}>
+          <VStack align="center">
             <SpinButton
               onPress={handleSpinPress}
               disabled={!canSpin}
               spinning={spinning || !allReelsStopped}
             />
-          </View>
+          </VStack>
         </MachineBody>
 
         <MachineLights active />
       </View>
 
-      <View style={{ marginTop: 16, alignItems: "center" }}>
+      <View className="mt-4 items-center">
         {!todaysPrompt && allReelsStopped ? (
           <Text variant="muted" className="text-sm text-center">
             Tap SPIN to get today&apos;s prompt
@@ -126,6 +128,6 @@ export default function Home() {
           <Text className="text-sm">{"\u00A0"}</Text>
         )}
       </View>
-    </View>
+    </Center>
   );
 }

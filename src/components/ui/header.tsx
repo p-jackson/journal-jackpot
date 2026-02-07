@@ -1,25 +1,38 @@
 import { View } from "react-native";
+import { HStack } from "./stack";
 
 function HeaderRoot({ children }: { children: React.ReactNode }) {
   return (
     <View>
-      <View className="px-4 h-14 flex flex-row items-center">{children}</View>
+      <HStack align="center" className="px-6">
+        {children}
+      </HStack>
     </View>
   );
 }
 
 function HeaderLeft({ children }: { children: React.ReactNode }) {
-  return <View className="flex flex-row flex-1 justify-start">{children}</View>;
+  return (
+    <HStack justify="start" className="flex-1">
+      {children}
+    </HStack>
+  );
 }
 
 function HeaderCenter({ children }: { children: React.ReactNode }) {
   return (
-    <View className="flex flex-row justify-center flex-[3]">{children}</View>
+    <HStack justify="center" className="flex-1">
+      {children}
+    </HStack>
   );
 }
 
 function HeaderRight({ children }: { children?: React.ReactNode }) {
-  return <View className="flex flex-row flex-1 justify-end">{children}</View>;
+  return (
+    <HStack justify="end" className="flex-1">
+      {children}
+    </HStack>
+  );
 }
 
 export const Header = Object.assign(HeaderRoot, {

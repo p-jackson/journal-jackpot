@@ -11,6 +11,7 @@
   --color-surface: var(--color-zinc-50);
   --color-surface-dark: var(--color-zinc-950);
   --color-primary: var(--color-violet-600);
+  --color-scary: var(--color-red-500);
   --color-text: var(--color-zinc-900);
   --color-text-dark: var(--color-zinc-100);
   --color-text-muted: var(--color-zinc-500);

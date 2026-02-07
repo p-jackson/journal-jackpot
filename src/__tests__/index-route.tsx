@@ -233,16 +233,16 @@ describe("Home", () => {
     });
   });
 
-  describe("reset", () => {
-    it("shows reset button on home screen", async () => {
+  describe("clear", () => {
+    it("shows clear button on home screen", async () => {
       renderApp({ initialUrl: "/" });
 
       await waitFor(() => {
-        expect(screen.getByText("Reset")).toBeTruthy();
+        expect(screen.getByText("Clear")).toBeTruthy();
       });
     });
 
-    it("clears data and refreshes UI on reset", async () => {
+    it("clears data and refreshes UI on press", async () => {
       const prompts = [
         { text: "older prompt too", createdAt: "2024-01-14T10:00:00.000Z" },
         { text: "test prompt here", createdAt: "2024-01-15T10:00:00.000Z" },
@@ -266,7 +266,7 @@ describe("Home", () => {
         expect(screen.getByText("History")).toBeTruthy();
       });
 
-      await user.press(screen.getByText("Reset"));
+      await user.press(screen.getByText("Clear"));
 
       // After reset, History link should disappear
       await waitFor(() => {

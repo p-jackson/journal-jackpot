@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Alert } from "react-native";
+import { Center } from "../components/ui/center";
+import { VStack } from "../components/ui/stack";
 import { Text } from "../components/ui/text";
 import type { ErrorBoundaryProps } from "expo-router";
-import { Slot, usePathname } from "expo-router";
+import { Slot, usePathname, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { Header } from "../components/ui/header";
-import { Link } from "../components/ui/link";
-import { DevResetButton } from "../components/ui/dev-reset-button";
+import { TextButton } from "../components/ui/text-button";
 import {
   PromptStorageProvider,
   usePromptStorage,
@@ -36,20 +37,19 @@ import "../../global.css";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
-    <View className="flex-1 bg-surface dark:bg-surface-dark justify-center items-center px-6">
-      <SafeAreaView>
-        <Text variant="page-title" className="mb-4 text-center">
-          Something went wrong
-        </Text>
-        <Text className="mb-6 text-center font-mono">{error.message}</Text>
-        <Pressable
-          onPress={() => void retry()}
-          className="bg-primary px-6 py-3 rounded-lg active:opacity-80"
-        >
-          <Text className="text-white font-semibold text-center">Refresh</Text>
-        </Pressable>
+    <Center className="flex-1 bg-surface dark:bg-surface-dark">
+      <SafeAreaView style={{ flex: 1 }}>
+        <Center className="flex-1">
+          <VStack align="center">
+            <Text variant="page-title">Something went wrong</Text>
+            <Text className="font-mono">{error.message}</Text>
+            <TextButton icon="reload" onPress={() => void retry()}>
+              Reload
+            </TextButton>
+          </VStack>
+        </Center>
       </SafeAreaView>
-    </View>
+    </Center>
   );
 }
 
@@ -96,63 +96,94 @@ export default function RootLayout() {
     return null;
   }
 
-  const handleReset = () => {
-    Alert.alert("Reset", "Clear all data?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Reset",
-        style: "destructive",
-        onPress: () => {
-          clearAllData()
-            .then(() => {
-              setHistory(null);
-              setResetKey((k) => k + 1);
-            })
-            .catch(setAsyncError);
+  const handleClearState = () => {
+    Alert.alert(
+      "Clear local state",
+      "Are you sure you want to clear all local prompt history? [dev only]",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Clear",
+          style: "destructive",
+          onPress: () => {
+            clearAllData()
+              .then(() => {
+                setHistory(null);
+                setResetKey((k) => k + 1);
+              })
+              .catch(setAsyncError);
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   return (
     <PromptStorageProvider key={resetKey} initialHistory={history}>
-      <AppShell onReset={handleReset} />
+      <AppShell onClearState={handleClearState} />
     </PromptStorageProvider>
   );
 }
 
 interface AppShellProps {
-  onReset: () => void;
+  onClearState: () => void;
 }
 
-function AppShell({ onReset }: AppShellProps): React.ReactElement {
+function AppShell({ onClearState }: AppShellProps): React.ReactElement {
   const pathname = usePathname();
+  const router = useRouter();
   const [history] = usePromptStorage();
 
   const isHome = pathname === "/";
+  const isHistory = pathname === "/history";
   const hasHistory = history.length >= 2;
 
   return (
-    <View className="flex-1 bg-surface dark:bg-surface-dark">
+    <VStack className="flex-1 bg-surface dark:bg-surface-dark">
       <SafeAreaView style={{ flex: 1 }}>
         <Header>
           <Header.Left>
-            {!isHome && <Link href="back" label="Back" icon="chevron-back" />}
-            {isHome && __DEV__ && <DevResetButton onPress={onReset} />}
+            {isHistory && (
+              <TextButton
+                icon="chevron-back"
+                onPress={() => {
+                  router.back();
+                }}
+              >
+                Back
+              </TextButton>
+            )}
+            {isHome && __DEV__ && (
+              <TextButton icon="trash" variant="scary" onPress={onClearState}>
+                Clear
+              </TextButton>
+            )}
           </Header.Left>
           <Header.Center>
-            {!isHome && <Text variant="page-title">History</Text>}
+            {
+              isHome && (
+                <Text variant="page-title">&nbsp;</Text>
+              ) /* Ensure the vertical size stays the same */
+            }
+            {isHistory && <Text variant="page-title">History</Text>}
           </Header.Center>
           <Header.Right>
             {isHome && hasHistory && (
-              <Link href="/history" label="History" icon="time-outline" />
+              <TextButton
+                icon="time-outline"
+                onPress={() => {
+                  router.push("/history");
+                }}
+              >
+                History
+              </TextButton>
             )}
           </Header.Right>
         </Header>
-        <View className="flex-1 w-full">
+        <VStack className="flex-1">
           <Slot />
-        </View>
+        </VStack>
       </SafeAreaView>
-    </View>
+    </VStack>
   );
 }
